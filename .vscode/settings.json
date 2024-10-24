@@ -10,6 +10,8 @@
     "sessionmaker",
     "sqlalchemy",
     "sqlmodel",
+    "thdc",
+    "uvicorn",
     "verceldb"
   ]
 }
