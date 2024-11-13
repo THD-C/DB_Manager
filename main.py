@@ -2,8 +2,8 @@ from concurrent import futures
 import os
 import grpc
 from grpc_reflection.v1alpha import reflection
-import user_pb2_grpc as user_pb2_grpc
-import user_pb2 as user_pb2
+import user.user_pb2_grpc as user_pb2_grpc
+import user.user_pb2 as user_pb2
 
 import src.DB as DB
 import src.Service as Service
