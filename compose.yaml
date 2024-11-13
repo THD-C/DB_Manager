@@ -1,12 +1,12 @@
 services:
-  Backend:
+  DB_Manager:
     build:
       dockerfile: Dockerfile
-    image: thd/backend
-    container_name: THD_Backend
+    image: thd/dbmanager
+    container_name: THD_DB_Manager
     restart: unless-stopped
     ports:
-      - 8000:8000
+      - 50051:50051
     environment:
       - POSTGRES_URL=postgresql://default:PL_tech_hand_elk@Postgres:5432/thdc
     depends_on:

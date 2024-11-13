@@ -7,6 +7,7 @@
     "opentelemetry",
     "OTEL",
     "OTLP",
+    "proto",
     "sessionmaker",
     "sqlalchemy",
     "sqlmodel",
