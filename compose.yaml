@@ -6,7 +6,7 @@ services:
     container_name: THD_Backend
     restart: unless-stopped
     ports:
-      - 8000:8000
+      - 50051:50051
     environment:
       - POSTGRES_URL=postgresql://default:PL_tech_hand_elk@Postgres:5432/thdc
     depends_on:
