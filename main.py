@@ -13,7 +13,7 @@ import src.Utils as Utils
 DB.create_tables(drop_existing=os.getenv("DROP_EXISTING_DB", True))
 
 def main() -> None:
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=2))
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     user_pb2_grpc.add_UserServicer_to_server(Service.User(), server)
     
     
