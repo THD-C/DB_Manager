@@ -1,0 +1,17 @@
+{
+  "cSpell.words": [
+    "autoflush",
+    "dotenv",
+    "fastapi",
+    "Instrumentor",
+    "opentelemetry",
+    "OTEL",
+    "OTLP",
+    "sessionmaker",
+    "sqlalchemy",
+    "sqlmodel",
+    "thdc",
+    "uvicorn",
+    "verceldb"
+  ]
+}
