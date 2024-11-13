@@ -1,9 +1,9 @@
 services:
-  Backend:
+  DB_Manager:
     build:
       dockerfile: Dockerfile
-    image: thd/backend
-    container_name: THD_Backend
+    image: thd/dbmanager
+    container_name: THD_DB_Manager
     restart: unless-stopped
     ports:
       - 50051:50051
