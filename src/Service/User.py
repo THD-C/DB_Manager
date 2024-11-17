@@ -28,7 +28,7 @@ class User(UserServicer):
             return AuthResponse(
                 success=True,
                 id=str(db_user.ID),
-                username=db_user.username,
-                email=db_user.email,
+                username=str(db_user.username),
+                email=str(db_user.email),
             )
         return AuthResponse(success=False)
