@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 env:
-  PYTHONPATH: ${{ github.workspace }}/src
+  PYTHONPATH: ${{ github.workspace }}
 
 jobs:
   Run_tests:
