@@ -1,6 +1,7 @@
-
 from typing import Type, TypeVar
 from google.protobuf.descriptor import FieldDescriptor
+
+gRPC = TypeVar("gRPC")
 
 T = TypeVar("T")
 
@@ -25,24 +26,43 @@ TYPE_MAP = {
     FieldDescriptor.TYPE_SINT64: int,
 }
 
-def create_grpc_model(model_class: Type[T], data_class) -> T:
+
+def create_grpc_list_model(
+    model_class: Type[gRPC], list_model_class: list[T], data_class: list[any]
+) -> gRPC:
+    grpc_fields: dict[str, type] = __get_grpc_model_fields_and_types(model_class)
+
+    result = model_class()
+    for f_name, f_type in grpc_fields.items():
+        if f_type == list_model_class:
+            r_list = []
+            for data in data_class:
+                r_list.append(create_grpc_model(f_type, data))
+            getattr(result, f_name).extend(r_list)
+
+    return result
+
+
+def create_grpc_model(model_class: Type[gRPC], data_class) -> gRPC:
     grpc_fields: dict[str, type] = __get_grpc_model_fields_and_types(model_class)
     data = {}
     for f_name, f_type in grpc_fields.items():
         if not hasattr(data_class, f_name):
             continue
         if getattr(data_class, f_name):
-            data[f_name] = f_type(
-                getattr(data_class, f_name)
-            )
+            data[f_name] = f_type(getattr(data_class, f_name))
         else:
             data[f_name] = None
-    
+
     return model_class(**data)
 
-def __get_grpc_model_fields_and_types(model_class: Type[T]) -> dict[str, type]:
+
+def __get_grpc_model_fields_and_types(model_class: Type[gRPC]) -> dict[str, type]:
     fields_and_types = {}
     # create a map of fields and their types
     for field_name, field_descriptor in model_class.DESCRIPTOR.fields_by_name.items():
-        fields_and_types[field_name] = TYPE_MAP.get(field_descriptor.type)
+        if field_descriptor.type == FieldDescriptor.TYPE_MESSAGE:
+            fields_and_types[field_name] = field_descriptor.message_type._concrete_class
+        else:
+            fields_and_types[field_name] = TYPE_MAP.get(field_descriptor.type)
     return fields_and_types
