@@ -5,8 +5,8 @@ from datetime import datetime
 class Order(SQLModel, table=True):
     __tablename__: str = "order"
 
-    ID: int = Field(primary_key=True, default=None)
-    user_ID: int = Field(foreign_key="user.ID", nullable=False)
+    id: int = Field(primary_key=True, default=None)
+    user_id: int = Field(foreign_key="user.ID", nullable=False)
     date_created: datetime = Field()
     date_executed: datetime = Field()
     status: str = Field()  # enum
