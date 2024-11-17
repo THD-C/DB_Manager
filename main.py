@@ -11,7 +11,7 @@ import src.DB as DB
 import src.Service as Service
 
 
-DB.create_tables(drop_existing=os.getenv("DROP_EXISTING_DB", True))
+DB.create_tables(drop_existing=os.getenv("DROP_EXISTING_DB", False))
 
 
 def main() -> None:

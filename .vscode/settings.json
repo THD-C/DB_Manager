@@ -9,6 +9,7 @@
     "OTLP",
     "proto",
     "protobuf",
+    "pydantic",
     "sessionmaker",
     "SFIXED",
     "sqlalchemy",
