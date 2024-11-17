@@ -32,6 +32,11 @@ class BaseDBOpsModel:
         session.add(self)
         session.commit()
         session.refresh(self)
+        
+        
+    def delete(self, session: Session):
+        session.delete(self)
+        session.commit()
 
     def __update_model_fields(self, values_to_update: Type[T]):
         fields = self.__get_model_fields(self.__class__)
