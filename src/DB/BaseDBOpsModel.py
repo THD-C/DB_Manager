@@ -32,8 +32,7 @@ class BaseDBOpsModel:
         session.add(self)
         session.commit()
         session.refresh(self)
-        
-        
+
     def delete(self, session: Session):
         session.delete(self)
         session.commit()
