@@ -21,16 +21,17 @@ class Wallet(WalletsServicer):
                 wallet = (
                     s.query(DB.Wallet).filter(DB.Wallet.id == int(request.id)).first()
                 )
-                wallet.update(s, DB.Wallet.create_model(DB.Wallet, request))
+                if wallet:
+                    wallet.update(s, DB.Wallet.create_model(DB.Wallet, request))
 
-                wallet_to_check = (
-                    s.query(DB.Wallet).filter(DB.Wallet.id == wallet.id).first()
-                )
+                    wallet_to_check = (
+                        s.query(DB.Wallet).filter(DB.Wallet.id == wallet.id).first()
+                    )
 
-            if wallet_to_check == wallet:
-                return Utils.create_grpc_model(grpcWallet.Wallet, wallet)
-            else:
-                wallet.id = None
+                    if wallet_to_check == wallet:
+                        return Utils.create_grpc_model(grpcWallet.Wallet, wallet)
+                    else:
+                        wallet.id = None
 
         except Exception as e:
             pass
@@ -41,7 +42,8 @@ class Wallet(WalletsServicer):
         try:
             with DB.Session() as s:
                 wallet = s.query(DB.Wallet).filter(DB.Wallet.id == request.id).first()
-                wallet.delete(s)
+                if wallet:
+                    wallet.delete(s)
         except Exception as e:
             wallet.id = None
 
