@@ -1,5 +1,7 @@
 # DB_Manager
 
+![image](/erd.png)
+
 ## Startup
 
 1. `docker compose build`
