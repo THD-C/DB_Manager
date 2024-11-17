@@ -12,40 +12,5 @@ env:
   PYTHONPATH: ${{ github.workspace }}
 
 jobs:
-  Run_tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: "true"
-
-      - run: | # To fetch all history for all tags and branches
-          git fetch --prune --unshallow
-
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.12 # Modify python version HERE
-
-      #Task for installing dependencies, multi-line command
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install black pytest
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
-      # Task for linting with black
-      - name: Lint with black
-        run: |
-          # Code formatting with black, check every python file in the src directory 
-          black --check --diff src
-
-      - name: protobuf
-        run: |
-          python -m grpc_tools.protoc -I=./Protocol/proto/ --python_out=. --grpc_python_out=. --pyi_out=. user/user.proto \
-          && python -m grpc_tools.protoc -I=./Protocol/proto/ --python_out=. --grpc_python_out=. --pyi_out=. wallet/wallet.proto
-
-      # Task for testing with pytest
-      - name: Test with pytest
-        run: |
-          pytest
+  Test:
+    uses: THD-C/GH_Actions/.github/workflows/run-tests.yml@main
