@@ -10,6 +10,15 @@ class Wallet(WalletsServicer):
         wallet = DB.Wallet.create_model(DB.Wallet, request)
         try:
             with DB.Session() as s:
+                existing_wallet = s.query(DB.Wallet).filter(DB.Wallet.currency == wallet.currency, DB.Wallet.user_id == wallet.user_id).first()
+        except Exception as e:
+            pass
+        
+        if existing_wallet:
+            return Utils.create_grpc_model(grpcWallet.Wallet, existing_wallet)
+        
+        try:
+            with DB.Session() as s:
                 wallet.insert(s)
         except Exception as e:
             pass
