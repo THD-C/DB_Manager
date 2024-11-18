@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   Generate:
@@ -21,6 +22,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
+      - name: Install Graphviz
+        run: sudo apt-get install -y graphviz
   
       - name: Generate ERD
         run: |
