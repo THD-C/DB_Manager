@@ -1,6 +1,6 @@
 # DB_Manager
 
-![image](/erd.png)
+![image](/ERD.png)
 
 ## Startup
 
