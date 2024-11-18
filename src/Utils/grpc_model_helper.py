@@ -49,7 +49,7 @@ def create_grpc_model(model_class: Type[gRPC], data_class) -> gRPC:
     for f_name, f_type in grpc_fields.items():
         if not hasattr(data_class, f_name):
             continue
-        if getattr(data_class, f_name):
+        if getattr(data_class, f_name) or getattr(data_class, f_name) == 0:
             data[f_name] = f_type(getattr(data_class, f_name))
         else:
             data[f_name] = None
