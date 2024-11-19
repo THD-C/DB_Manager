@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: "true"
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -28,6 +30,11 @@ jobs:
 
       - name: Install Graphviz
         run: sudo apt-get install -y graphviz
+
+      - name: protobuf
+        run: |
+          python -m grpc_tools.protoc -I=./Protocol/proto/ --python_out=. --grpc_python_out=. --pyi_out=. user/user.proto \
+          && python -m grpc_tools.protoc -I=./Protocol/proto/ --python_out=. --grpc_python_out=. --pyi_out=. wallet/wallet.proto
   
       - name: Generate ERD
         run: |

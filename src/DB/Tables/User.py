@@ -18,9 +18,12 @@ class User(SQLModel, BaseDBOpsModel, table=True):
 
     def __eq__(self, other):
         if isinstance(other, AuthUser):
-            return (self.email == getattr(other, "login") or self.username == getattr(other, "login")) and self.password == getattr(other, "password")
-        
+            return (
+                self.email == getattr(other, "login")
+                or self.username == getattr(other, "login")
+            ) and self.password == getattr(other, "password")
+
         if isinstance(other, User):
             return self.email == other.email and self.password == other.password
-        
+
         return False
