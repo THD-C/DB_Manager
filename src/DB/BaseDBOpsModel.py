@@ -22,15 +22,17 @@ class BaseDBOpsModel:
                 data[field] = None
         return model_class(**data)
 
-    def insert(self, session: Session):
+    def insert(self, session: Session, skip_commit=False):
         session.add(self)
-        session.commit()
+        if not skip_commit:
+            session.commit()
         session.refresh(self)
 
-    def update(self, session: Session, values_to_update: Type[T]):
+    def update(self, session: Session, values_to_update: Type[T], skip_commit=False):
         self.__update_model_fields(values_to_update)
         session.add(self)
-        session.commit()
+        if not skip_commit:
+            session.commit()
         session.refresh(self)
 
     def delete(self, session: Session):
