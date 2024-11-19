@@ -44,16 +44,13 @@ def create_grpc_list_model(
 
 
 def create_grpc_model(model_class: Type[gRPC], data_class) -> gRPC:
-    grpc_fields: dict[str, type] = __get_grpc_model_fields_and_types(model_class)
-    data = {}
-    for f_name, f_type in grpc_fields.items():
-        if not hasattr(data_class, f_name):
-            continue
-        if getattr(data_class, f_name) or getattr(data_class, f_name) == 0:
-            data[f_name] = f_type(getattr(data_class, f_name))
-        else:
-            data[f_name] = None
 
+    if isinstance(data_class, dict):
+        data = __create_grpc_based_on_dict(model_class, data_class)
+    elif isinstance(data_class, type):
+        data = __create_grpc_based_on_class(model_class, data_class)
+    else:
+        data = {}
     return model_class(**data)
 
 
@@ -66,3 +63,29 @@ def __get_grpc_model_fields_and_types(model_class: Type[gRPC]) -> dict[str, type
         else:
             fields_and_types[field_name] = TYPE_MAP.get(field_descriptor.type)
     return fields_and_types
+
+
+def __create_grpc_based_on_class(model_class: Type[gRPC], data_class) -> dict:
+    grpc_fields: dict[str, type] = __get_grpc_model_fields_and_types(model_class)
+    data = {}
+    for f_name, f_type in grpc_fields.items():
+        if not hasattr(data_class, f_name):
+            continue
+        if getattr(data_class, f_name) or getattr(data_class, f_name) == 0:
+            data[f_name] = f_type(getattr(data_class, f_name))
+        else:
+            data[f_name] = None
+    return data
+
+
+def __create_grpc_based_on_dict(model_class: Type[gRPC], data_dict: dict) -> dict:
+    grpc_fields: dict[str, type] = __get_grpc_model_fields_and_types(model_class)
+    data = {}
+    for f_name, f_type in grpc_fields.items():
+        if not data_dict.get(f_name, None):
+            continue
+        if data_dict.get(f_name) or data_dict.get(f_name) == 0:
+            data[f_name] = f_type(data_dict.get(f_name))
+        else:
+            data[f_name] = None
+    return data
