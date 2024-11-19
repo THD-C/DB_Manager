@@ -30,7 +30,7 @@ class User(UserServicer):
             return RegResponse(success=True)
         except Exception as e:
             print(e)
-            
+
             return RegResponse(success=False)
 
     def Authenticate(self, request: AuthUser, context):
@@ -122,13 +122,13 @@ class User(UserServicer):
                 )
                 if db_user is None:
                     return ResultResponse(success=False)
-                
+
                 db_user_detail = (
                     s.query(DB.UserDetail)
                     .filter(DB.UserDetail.ID == db_user.user_detail_ID)
                     .first()
                 )
-                
+
                 db_user_detail.delete(s)
                 db_user.delete(s)
                 return ResultResponse(success=True, id=request.id)
