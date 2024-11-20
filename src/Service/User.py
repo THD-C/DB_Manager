@@ -78,35 +78,37 @@ class User(UserServicer):
             )
 
     def Update(self, request: ReqUpdateUser, context):
+        error: bool = False
+
         with DB.Session() as s:
             db_user = s.query(DB.User).filter(DB.User.ID == request.id).first()
-
             if db_user is None:
                 return ResultResponse(success=False)
 
             if request.email or request.password:
                 try:
                     db_user.update(s, DB.User.create_model(DB.User, request))
-                    return ResultResponse(success=True, id=db_user.ID)
                 except Exception as e:
                     print(e)
-                    pass
-            else:
-                try:
-                    db_user_detail = (
-                        s.query(DB.UserDetail)
-                        .filter(DB.UserDetail.ID == db_user.user_detail_ID)
-                        .first()
-                    )
-                    db_user_detail.update(
-                        s, DB.UserDetail.create_model(DB.UserDetail, request)
-                    )
-                    return ResultResponse(success=True, id=str(db_user.ID))
-                except Exception as e:
-                    print(e)
-                    pass
+                    error = True
 
-        return ResultResponse(success=False)
+            try:
+                db_user_detail = (
+                    s.query(DB.UserDetail)
+                    .filter(DB.UserDetail.ID == db_user.user_detail_ID)
+                    .first()
+                )
+                db_user_detail.update(
+                    s, DB.UserDetail.create_model(DB.UserDetail, request)
+                )
+            except Exception as e:
+                print(e)
+                error = True
+
+        if error:
+            return ResultResponse(success=False)
+
+        return ResultResponse(success=True, id=request.id)
 
     def Delete(self, request: ReqDeleteUser, context):
         try:
