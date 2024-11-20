@@ -18,5 +18,35 @@ class Order(OrderServicer):
             print(e)
         return gRPC.OrderDetails()
 
-    def UpdateOrder(self, request: gRPC.OrderDetails, context):
-        pass
+    def GetOrder(self, request: gRPC.OrderID, context):
+        try:
+            with DB.Session() as s:
+                order = s.query(DB.Order).filter_by(id=request.id).first()
+
+            return Utils.create_grpc_model(gRPC.OrderDetails, order)
+        except Exception as e:
+            print(e)
+        return gRPC.OrderDetails()
+
+    def GetOrderList(self, request: gRPC.UserID, context):
+        try:
+            with DB.Session() as s:
+                orders = s.query(DB.Order).filter(DB.Order.user_id == request.id).all()
+
+            return Utils.create_grpc_list_model(
+                gRPC.OrderList, gRPC.OrderDetails, orders
+            )
+        except Exception as e:
+            print(e)
+        return gRPC.OrderList()
+
+    def DeleteOrder(self, request: gRPC.OrderID, context):
+        try:
+            with DB.Session() as s:
+                order = s.query(DB.Order).filter_by(id=request.id).first()
+                if order:
+                    order.delete(s)
+            return Utils.create_grpc_model(gRPC.OrderDetails, order)
+        except Exception as e:
+            print(e)
+        return gRPC.OrderDetails()
