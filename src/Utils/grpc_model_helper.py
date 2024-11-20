@@ -1,5 +1,6 @@
 from typing import Type, TypeVar
 from google.protobuf.descriptor import FieldDescriptor
+from google.protobuf.timestamp_pb2 import Timestamp
 
 gRPC = TypeVar("gRPC")
 
@@ -44,12 +45,13 @@ def create_grpc_list_model(
 
 
 def create_grpc_model(model_class: Type[gRPC], data_class) -> gRPC:
-
-    if isinstance(data_class, dict):
-        data = __create_grpc_based_on_dict(model_class, data_class)
-    elif isinstance(data_class, type):
-        data = __create_grpc_based_on_class(model_class, data_class)
-    else:
+    try:
+        if isinstance(data_class, dict):
+            data = __create_grpc_based_on_dict(model_class, data_class)
+        else:
+            data = __create_grpc_based_on_class(model_class, data_class)
+    except Exception as e:
+        print(e)
         data = {}
     return model_class(**data)
 
@@ -72,7 +74,11 @@ def __create_grpc_based_on_class(model_class: Type[gRPC], data_class) -> dict:
         if not hasattr(data_class, f_name):
             continue
         if getattr(data_class, f_name) or getattr(data_class, f_name) == 0:
-            data[f_name] = f_type(getattr(data_class, f_name))
+            if f_type == Timestamp:
+                data[f_name] = Timestamp()
+                data[f_name].FromDatetime(getattr(data_class, f_name))
+            else:
+                data[f_name] = f_type(getattr(data_class, f_name))
         else:
             data[f_name] = None
     return data
