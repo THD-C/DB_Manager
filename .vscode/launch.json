@@ -9,12 +9,11 @@
             "console": "integratedTerminal",
         },
         {
-            "name": "Debuger FastAPI",
+            "name": "DB_manager",
             "type": "debugpy",
             "request": "launch",
-            "module": "uvicorn",
-            "args": ["main:app", "--reload"],
-            "jinja": true
+            "program": "main.py",
+            "console": "integratedTerminal",
         }
     ]
 }
