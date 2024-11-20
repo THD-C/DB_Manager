@@ -16,7 +16,8 @@ class BaseDBOpsModel:
         for field in field_names:
             if not hasattr(proto_request, field):
                 continue
-            if getattr(proto_request, field):
+            
+            if getattr(proto_request, field) or getattr(proto_request, field) == 0:
                 data_type = BaseDBOpsModel.__get_type(model_class, field)
 
                 if data_type == datetime.datetime:
