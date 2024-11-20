@@ -1,8 +1,10 @@
 from typing import Type, TypeVar
 from sqlalchemy.orm import Session
-
+import datetime
 
 T = TypeVar("T")
+
+NULL_DATE = datetime.datetime(1970, 1, 1, 0, 0)
 
 
 class BaseDBOpsModel:
@@ -14,10 +16,16 @@ class BaseDBOpsModel:
         for field in field_names:
             if not hasattr(proto_request, field):
                 continue
-            if getattr(proto_request, field):
-                data[field] = BaseDBOpsModel.__get_type(model_class, field)(
-                    getattr(proto_request, field)
-                )
+
+            if getattr(proto_request, field) or getattr(proto_request, field) == 0:
+                data_type = BaseDBOpsModel.__get_type(model_class, field)
+
+                if data_type == datetime.datetime:
+                    data[field] = getattr(proto_request, field).ToDatetime()
+                    if data[field] == NULL_DATE:
+                        data[field] = None
+                else:
+                    data[field] = data_type(getattr(proto_request, field))
             else:
                 data[field] = None
         return model_class(**data)

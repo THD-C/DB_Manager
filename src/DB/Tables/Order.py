@@ -1,8 +1,9 @@
 from sqlmodel import SQLModel, Field
 from datetime import datetime
+from src.DB.BaseDBOpsModel import BaseDBOpsModel
 
 
-class Order(SQLModel, table=True):
+class Order(SQLModel, BaseDBOpsModel, table=True):
     __tablename__: str = "order"
 
     id: int = Field(primary_key=True, default=None)
