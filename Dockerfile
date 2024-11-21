@@ -7,11 +7,10 @@ WORKDIR /code/app
 COPY ./requirements.txt /code/requirements.txt
 
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
-RUN python -m grpc_tools.protoc -I=./Protocol/proto/ --python_out=. --grpc_python_out=. --pyi_out=. user/user.proto \
-    && python -m grpc_tools.protoc -I=./Protocol/proto/ --python_out=. --grpc_python_out=. --pyi_out=. wallet/wallet.proto \
-    && python -m grpc_tools.protoc -I=./Protocol/proto/ --python_out=. --grpc_python_out=. --pyi_out=. order/order.proto \
-    && python -m grpc_tools.protoc -I=./Protocol/proto/ --python_out=. --grpc_python_out=. --pyi_out=. order/order_side.proto \
-    && python -m grpc_tools.protoc -I=./Protocol/proto/ --python_out=. --grpc_python_out=. --pyi_out=. order/order_status.proto \
-    && python -m grpc_tools.protoc -I=./Protocol/proto/ --python_out=. --grpc_python_out=. --pyi_out=. order/order_type.proto 
+RUN curl -s -L -o thdcgrpc.tar.gz https://github.com/THD-C/Protocol/releases/latest/download/thdcgrpc.tar.gz \
+    && tar -xzf thdcgrpc.tar.gz \
+    && rm thdcgrpc.tar.gz \
+    && cp -r thdcgrpc/* . \
+    && rm -r thdcgrpc
 
 CMD ["python","main.py"]
