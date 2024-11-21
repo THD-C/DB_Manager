@@ -16,6 +16,7 @@
     "sqlalchemy",
     "sqlmodel",
     "thdc",
+    "thdcgrpc",
     "uvicorn",
     "verceldb"
   ],

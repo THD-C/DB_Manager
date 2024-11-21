@@ -9,6 +9,7 @@
             "console": "integratedTerminal",
         },
         {
+            "preLaunchTask": "download_thdcgrpc",
             "name": "DB_manager",
             "type": "debugpy",
             "request": "launch",

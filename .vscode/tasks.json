@@ -1,0 +1,10 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "download_thdcgrpc",
+            "command": "curl -s -L -o thdcgrpc.tar.gz https://github.com/THD-C/Protocol/releases/latest/download/thdcgrpc.tar.gz && tar -xzf thdcgrpc.tar.gz && rm thdcgrpc.tar.gz && cp -r thdcgrpc/* . && rm -r thdcgrpc", 
+            "type": "shell"
+        }
+    ]
+}
