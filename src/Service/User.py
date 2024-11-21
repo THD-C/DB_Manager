@@ -131,8 +131,8 @@ class User(UserServicer):
                     .first()
                 )
 
-                db_user_detail.delete(s)
                 db_user.delete(s)
+                db_user_detail.delete(s)
                 return ResultResponse(success=True, id=request.id)
         except Exception as e:
             print(e)
