@@ -33,8 +33,7 @@ jobs:
 
       - name: protobuf
         run: |
-          python -m grpc_tools.protoc -I=./Protocol/proto/ --python_out=. --grpc_python_out=. --pyi_out=. user/user.proto \
-          && python -m grpc_tools.protoc -I=./Protocol/proto/ --python_out=. --grpc_python_out=. --pyi_out=. wallet/wallet.proto
+          curl -s -L -o thdcgrpc.tar.gz https://github.com/THD-C/Protocol/releases/latest/download/thdcgrpc.tar.gz && tar -xzf thdcgrpc.tar.gz && rm thdcgrpc.tar.gz && cp -r thdcgrpc/* . && rm -r thdcgrpc
   
       - name: Generate ERD
         run: |

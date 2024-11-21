@@ -4,9 +4,9 @@ asgiref==3.8.1
 click==8.1.7
 Deprecated==1.2.14
 eralchemy==1.5.0
-grpcio==1.67.1
-grpcio-reflection==1.67.1
-grpcio-tools==1.67.1
+grpcio==1.68.0
+grpcio-reflection==1.68.0
+grpcio-tools==1.68.0
 h11==0.14.0
 idna==3.10
 importlib_metadata==8.4.0
