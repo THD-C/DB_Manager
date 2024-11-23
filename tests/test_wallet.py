@@ -1,80 +1,297 @@
 import pytest
-from unittest.mock import MagicMock, patch
-from src.Service.Wallet import Wallet
-from wallet.wallet_pb2 import WalletID, Wallet as grpcWallet
-from src import DB, Utils
+import src.Service as Service
+import src.DB as DB
+import tests.helpers as helpers
 
-@pytest.fixture
-def mock_session(mocker):
-    return mocker.patch('src.DB.Session')
+from wallet.wallet_pb2 import Wallet, WalletID, UserID
 
-@pytest.fixture
-def mock_wallet(mocker):
-    return mocker.patch('src.DB.Wallet')
 
-@pytest.fixture
-def mock_utils(mocker):
-    return mocker.patch('src.Utils.create_grpc_model')
+@pytest.fixture(autouse=True)
+def setup():
+    DB.create_tables(drop_existing=True)
+    helpers.register_user(Service.User())
 
-def test_delete_wallet_success(mock_session, mock_wallet, mock_utils):
-    # Arrange
-    mock_request = MagicMock(spec=WalletID)
-    mock_request.id = 1
-    mock_context = MagicMock()
-    mock_wallet_instance = MagicMock()
-    mock_session_instance = MagicMock()
-    mock_session.return_value.__enter__.return_value = mock_session_instance
-    mock_session_instance.query.return_value.filter.return_value.first.return_value = mock_wallet_instance
 
-    wallet_service = Wallet()
+def test_create_wallet_success():
+    s = Service.Wallet()
+    w_resp = s.createWallet(
+        helpers.WALLET_1,
+        None,
+    )
 
-    # Act
-    response = wallet_service.deleteWallet(mock_request, mock_context)
+    assert w_resp.id != ""
+    assert w_resp.currency == helpers.WALLET_1.currency
+    assert w_resp.value == helpers.WALLET_1.value
+    assert w_resp.user_id == helpers.WALLET_1.user_id
 
-    # Assert
-    mock_session_instance.query.return_value.filter.assert_called_once_with(DB.Wallet.id == mock_request.id)
-    mock_wallet_instance.delete.assert_called_once_with(mock_session_instance)
-    mock_utils.assert_called_once_with(grpcWallet, mock_wallet_instance)
-    assert response == mock_utils.return_value
 
-def test_delete_wallet_not_found(mock_session, mock_wallet, mock_utils):
-    # Arrange
-    mock_request = MagicMock(spec=WalletID)
-    mock_request.id = 1
-    mock_context = MagicMock()
-    mock_session_instance = MagicMock()
-    mock_session.return_value.__enter__.return_value = mock_session_instance
-    mock_session_instance.query.return_value.filter.return_value.first.return_value = None
+def test_create_wallet_fail():
+    s = Service.Wallet()
+    w_resp = s.createWallet(
+        Wallet(
+            currency=helpers.WALLET_1.currency,
+            value=helpers.WALLET_1.value,
+        ),
+        None,
+    )
 
-    wallet_service = Wallet()
+    assert w_resp.id == ""
+    assert w_resp.currency == ""
+    assert w_resp.value == ""
+    assert w_resp.user_id == ""
 
-    # Act
-    response = wallet_service.deleteWallet(mock_request, mock_context)
 
-    # Assert
-    mock_session_instance.query.return_value.filter.assert_called_once_with(DB.Wallet.id == mock_request.id)
-    mock_utils.assert_called_once_with(grpcWallet, None)
-    assert response == mock_utils.return_value
+def test_update_wallet_success():
+    s = Service.Wallet()
+    helpers.create_wallet(s)
+    w_resp = s.updateWallet(
+        Wallet(
+            id="1",
+            currency=helpers.WALLET_2.currency,
+            value=helpers.WALLET_2.currency,
+            user_id=helpers.WALLET_1.user_id,
+        ),
+        None,
+    )
 
-def test_delete_wallet_exception(mock_session, mock_wallet, mock_utils):
-    # Arrange
-    mock_request = MagicMock(spec=WalletID)
-    mock_request.id = 1
-    mock_context = MagicMock()
-    mock_wallet_instance = MagicMock()
-    mock_session_instance = MagicMock()
-    mock_session.return_value.__enter__.return_value = mock_session_instance
-    mock_session_instance.query.return_value.filter.return_value.first.return_value = mock_wallet_instance
-    mock_wallet_instance.delete.side_effect = Exception("DB Error")
+    assert w_resp.id == "1"
+    assert w_resp.currency == helpers.WALLET_2.currency
+    assert w_resp.value == helpers.WALLET_2.value
+    assert w_resp.user_id == helpers.WALLET_1.user_id
 
-    wallet_service = Wallet()
 
-    # Act
-    response = wallet_service.deleteWallet(mock_request, mock_context)
+def test_update_wallet_success():
+    s = Service.Wallet()
+    helpers.create_wallet(s)
+    w_resp = s.updateWallet(
+        Wallet(
+            id="1",
+            currency=helpers.WALLET_2.currency,
+            value=helpers.WALLET_2.value,
+        ),
+        None,
+    )
 
-    # Assert
-    mock_session_instance.query.return_value.filter.assert_called_once_with(DB.Wallet.id == mock_request.id)
-    mock_wallet_instance.delete.assert_called_once_with(mock_session_instance)
-    assert mock_wallet_instance.id is None
-    mock_utils.assert_called_once_with(grpcWallet, mock_wallet_instance)
-    assert response == mock_utils.return_value
+    assert w_resp.id == "1"
+    assert w_resp.currency == helpers.WALLET_2.currency
+    assert w_resp.value == helpers.WALLET_2.value
+    assert w_resp.user_id == helpers.WALLET_1.user_id
+
+
+def test_update_wallet_fail():
+    s = Service.Wallet()
+    helpers.create_wallet(s)
+    w_resp = s.updateWallet(
+        Wallet(
+            currency=helpers.WALLET_2.currency,
+            value=helpers.WALLET_2.currency,
+            user_id=helpers.WALLET_1.user_id,
+        ),
+        None,
+    )
+
+    assert w_resp.id == ""
+    assert w_resp.currency == ""
+    assert w_resp.value == ""
+    assert w_resp.user_id == ""
+
+
+def test_delete_wallet_success():
+    s = Service.Wallet()
+    helpers.create_wallet(s)
+    helpers.create_wallet(s, helpers.WALLET_2)
+    helpers.create_wallet(s, helpers.WALLET_3)
+
+    w_resp = s.deleteWallet(
+        WalletID(
+            id="2",
+        ),
+        None,
+    )
+
+    assert w_resp.id == "2"
+    assert w_resp.currency == helpers.WALLET_2.currency
+    assert w_resp.value == helpers.WALLET_2.value
+    assert w_resp.user_id == helpers.WALLET_2.user_id
+
+
+def test_delete_wallet_fail():
+    s = Service.Wallet()
+    helpers.create_wallet(s)
+    helpers.create_wallet(s, helpers.WALLET_2)
+    helpers.create_wallet(s, helpers.WALLET_3)
+
+    w_resp = s.deleteWallet(
+        WalletID(
+            id="1234567",
+        ),
+        None,
+    )
+
+    assert w_resp.id == ""
+    assert w_resp.currency == ""
+    assert w_resp.value == ""
+    assert w_resp.user_id == ""
+
+
+def test_get_wallet_2_success():
+    s = Service.Wallet()
+    helpers.create_wallet(s)
+    helpers.create_wallet(s, helpers.WALLET_2)
+    helpers.create_wallet(s, helpers.WALLET_3)
+
+    w_resp = s.getWallet(
+        WalletID(
+            id="2",
+        ),
+        None,
+    )
+
+    assert w_resp.id == "2"
+    assert w_resp.currency == helpers.WALLET_2.currency
+    assert w_resp.value == helpers.WALLET_2.value
+    assert w_resp.user_id == helpers.WALLET_2.user_id
+
+
+def test_get_wallet_3_success():
+    s = Service.Wallet()
+    helpers.create_wallet(s)
+    helpers.create_wallet(s, helpers.WALLET_2)
+    helpers.create_wallet(s, helpers.WALLET_3)
+
+    w_resp = s.getWallet(
+        WalletID(
+            id="3",
+        ),
+        None,
+    )
+
+    assert w_resp.id == "3"
+    assert w_resp.currency == helpers.WALLET_3.currency
+    assert w_resp.value == helpers.WALLET_3.value
+    assert w_resp.user_id == helpers.WALLET_3.user_id
+
+
+def test_get_wallet_fail():
+    s = Service.Wallet()
+    helpers.create_wallet(s)
+    helpers.create_wallet(s, helpers.WALLET_2)
+    helpers.create_wallet(s, helpers.WALLET_3)
+
+    w_resp = s.getWallet(
+        WalletID(
+            id="123457898764",
+        ),
+        None,
+    )
+
+    assert w_resp.id == ""
+    assert w_resp.currency == ""
+    assert w_resp.value == ""
+    assert w_resp.user_id == ""
+
+
+def test_get_user_wallet_list_3_success():
+    s = Service.Wallet()
+    helpers.create_wallet(s)
+    helpers.create_wallet(s, helpers.WALLET_2)
+    helpers.create_wallet(s, helpers.WALLET_3)
+
+    w_resp = s.getUsersWallets(
+        UserID(
+            id="1",
+        ),
+        None,
+    )
+
+    assert len(w_resp.wallets) == 3
+    assert [
+        helpers.WALLET_1.currency,
+        helpers.WALLET_2.currency,
+        helpers.WALLET_3.currency,
+    ] == [w.currency for w in w_resp.wallets]
+    assert [
+        helpers.WALLET_1.value,
+        helpers.WALLET_2.value,
+        helpers.WALLET_3.value,
+    ] == [w.value for w in w_resp.wallets]
+    assert [
+        helpers.WALLET_1.user_id,
+        helpers.WALLET_2.user_id,
+        helpers.WALLET_3.user_id,
+    ] == [w.user_id for w in w_resp.wallets]
+    assert [
+        "1",
+        "2",
+        "3",
+    ] == [w.id for w in w_resp.wallets]
+
+
+def test_get_user_wallet_list_2_success():
+    s = Service.Wallet()
+    helpers.create_wallet(s)
+    helpers.create_wallet(s, helpers.WALLET_2)
+
+    w_resp = s.getUsersWallets(
+        UserID(
+            id="1",
+        ),
+        None,
+    )
+
+    assert len(w_resp.wallets) == 2
+    assert [
+        helpers.WALLET_1.currency,
+        helpers.WALLET_2.currency,
+    ] == [w.currency for w in w_resp.wallets]
+    assert [
+        helpers.WALLET_1.value,
+        helpers.WALLET_2.value,
+    ] == [w.value for w in w_resp.wallets]
+    assert [
+        helpers.WALLET_1.user_id,
+        helpers.WALLET_2.user_id,
+    ] == [w.user_id for w in w_resp.wallets]
+    assert [
+        "1",
+        "2",
+    ] == [w.id for w in w_resp.wallets]
+
+def test_get_user_wallet_list_1_success():
+    s = Service.Wallet()
+    helpers.create_wallet(s)
+
+    w_resp = s.getUsersWallets(
+        UserID(
+            id="1",
+        ),
+        None,
+    )
+
+    assert len(w_resp.wallets) == 1
+    assert [
+        helpers.WALLET_1.currency,
+    ] == [w.currency for w in w_resp.wallets]
+    assert [
+        helpers.WALLET_1.value,
+    ] == [w.value for w in w_resp.wallets]
+    assert [
+        helpers.WALLET_1.user_id,
+    ] == [w.user_id for w in w_resp.wallets]
+    assert [
+        "1",
+    ] == [w.id for w in w_resp.wallets]
+    
+def test_get_user_wallet_list_fail():
+    s = Service.Wallet()
+    helpers.create_wallet(s)
+
+    w_resp = s.getUsersWallets(
+        UserID(
+            id="12345678",
+        ),
+        None,
+    )
+
+    assert len(w_resp.wallets) == 0
+    

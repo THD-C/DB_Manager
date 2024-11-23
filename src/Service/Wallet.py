@@ -19,7 +19,7 @@ class Wallet(WalletsServicer):
                     .first()
                 )
         except Exception as e:
-            pass
+            print(e)
 
         if existing_wallet:
             return Utils.create_grpc_model(grpcWallet.Wallet, existing_wallet)
@@ -28,7 +28,8 @@ class Wallet(WalletsServicer):
             with DB.Session() as s:
                 wallet.insert(s)
         except Exception as e:
-            pass
+            print(e)
+            return Utils.create_grpc_model(grpcWallet.Wallet, None)
         return Utils.create_grpc_model(grpcWallet.Wallet, wallet)
 
     def updateWallet(self, request: grpcWallet.Wallet, context) -> grpcWallet.Wallet:
@@ -50,7 +51,8 @@ class Wallet(WalletsServicer):
                         wallet.id = None
 
         except Exception as e:
-            pass
+            print(e)
+            return Utils.create_grpc_model(grpcWallet.Wallet, None)
 
         return Utils.create_grpc_model(grpcWallet.Wallet, wallet)
 

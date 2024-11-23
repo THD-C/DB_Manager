@@ -1,54 +1,435 @@
 import pytest
-from unittest.mock import MagicMock
-from src.Service.User import User
-from user.user_pb2 import RegResponse, AuthResponse
+import src.Service as Service
+import src.DB as DB
+import tests.helpers as helpers
 
-@pytest.fixture
-def mock_session(mocker):
-    return mocker.patch('src.DB.Session')
+from user.user_pb2 import AuthUser, ReqGetUserDetails, ReqDeleteUser, ReqUpdateUser
 
-@pytest.fixture
-def mock_user(mocker):
-    return mocker.patch('src.DB.User')
 
-@pytest.fixture
-def mock_user_detail(mocker):
-    return mocker.patch('src.DB.UserDetail')
+@pytest.fixture(autouse=True)
+def setup():
+    DB.create_tables(drop_existing=True)
+    print("Setup completed")
 
-def test_register_success(mock_user_detail, mock_user, mock_session):
-    # Arrange
-    mock_request = MagicMock()
-    mock_context = MagicMock()
-    mock_user_detail.create_model.return_value = MagicMock(ID=1)
-    mock_user.create_model.return_value = MagicMock()
-    mock_session.return_value.__enter__.return_value = MagicMock()
 
-    user_service = User()
+def test_register_success():
+    s = Service.User()
+    r_resp = helpers.register_user(s)
+    a_resp = s.Authenticate(
+        AuthUser(
+            login=helpers.USER_REGISTER_REQUEST.email,
+            password=helpers.USER_REGISTER_REQUEST.password,
+        ),
+        None,
+    )
 
-    # Act
-    response = user_service.Register(mock_request, mock_context)
+    assert r_resp.success == True
+    assert a_resp.success == True
+    assert a_resp.email == helpers.USER_REGISTER_REQUEST.email
+    assert a_resp.username == helpers.USER_REGISTER_REQUEST.username
 
-    # Assert
-    assert isinstance(response, RegResponse)
-    assert response.success
-    mock_user_detail.create_model.assert_called_once_with(mock_user_detail, mock_request)
-    mock_user.create_model.assert_called_once_with(mock_user, mock_request)
 
-def test_register_failure(mock_user_detail, mock_user, mock_session):
-    # Arrange
-    mock_request = MagicMock()
-    mock_context = MagicMock()
-    mock_user_detail.create_model.return_value = MagicMock(ID=1)
-    mock_user.create_model.return_value = MagicMock()
-    mock_session.return_value.__enter__.side_effect = Exception("DB Error")
+def test_register_fail():
+    s = Service.User()
+    r_resp = helpers.register_user(s)
+    r_resp2 = helpers.register_user(s)
 
-    user_service = User()
+    assert r_resp.success == True
+    assert r_resp2.success == False
 
-    # Act
-    response = user_service.Register(mock_request, mock_context)
 
-    # Assert
-    assert isinstance(response, RegResponse)
-    assert not response.success
-    mock_user_detail.create_model.assert_called_once_with(mock_user_detail, mock_request)
-    mock_user.create_model.assert_called_once_with(mock_user, mock_request)
+def test_login_with_email_success():
+    s = Service.User()
+    helpers.register_user(s)
+    a_resp = s.Authenticate(
+        AuthUser(
+            login=helpers.USER_REGISTER_REQUEST.email,
+            password=helpers.USER_REGISTER_REQUEST.password,
+        ),
+        None,
+    )
+
+    assert a_resp.success == True
+    assert a_resp.email == helpers.USER_REGISTER_REQUEST.email
+    assert a_resp.username == helpers.USER_REGISTER_REQUEST.username
+
+
+def test_login_with_username_success():
+    s = Service.User()
+    helpers.register_user(s)
+    a_resp = s.Authenticate(
+        AuthUser(
+            login=helpers.USER_REGISTER_REQUEST.username,
+            password=helpers.USER_REGISTER_REQUEST.password,
+        ),
+        None,
+    )
+
+    assert a_resp.success == True
+    assert a_resp.email == helpers.USER_REGISTER_REQUEST.email
+    assert a_resp.username == helpers.USER_REGISTER_REQUEST.username
+
+
+def test_login_without_email_1_fail():
+    s = Service.User()
+    helpers.register_user(s)
+    a_resp = s.Authenticate(
+        AuthUser(
+            login="",
+            password=helpers.USER_REGISTER_REQUEST.password,
+        ),
+        None,
+    )
+
+    assert a_resp.success == False
+
+
+def test_login_without_email_2_fail():
+    s = Service.User()
+    helpers.register_user(s)
+    a_resp = s.Authenticate(
+        AuthUser(
+            login="",
+            password="",
+        ),
+        None,
+    )
+
+    assert a_resp.success == False
+
+
+def test_login_without_password_fail():
+    s = Service.User()
+    helpers.register_user(s)
+    a_resp = s.Authenticate(
+        AuthUser(
+            login=helpers.USER_REGISTER_REQUEST.email,
+            password="",
+        ),
+        None,
+    )
+
+    assert a_resp.success == False
+
+
+def test_login_with_wrong_password_fail():
+    s = Service.User()
+    helpers.register_user(s)
+    a_resp = s.Authenticate(
+        AuthUser(
+            login=helpers.USER_REGISTER_REQUEST.email,
+            password="wrong_password",
+        ),
+        None,
+    )
+    assert a_resp.success == False
+
+
+def test_get_user_details_success():
+    s = Service.User()
+    r_resp = helpers.register_user(s)
+    a_resp = s.Authenticate(
+        AuthUser(
+            login=helpers.USER_REGISTER_REQUEST.email,
+            password=helpers.USER_REGISTER_REQUEST.password,
+        ),
+        None,
+    )
+    user_details = s.GetUserDetails(
+        ReqGetUserDetails(id=a_resp.id),
+        None,
+    )
+    assert user_details.username == helpers.USER_REGISTER_REQUEST.username
+    assert user_details.email == helpers.USER_REGISTER_REQUEST.email
+    assert user_details.name == helpers.USER_REGISTER_REQUEST.name
+    assert user_details.surname == helpers.USER_REGISTER_REQUEST.surname
+    assert user_details.street == helpers.USER_REGISTER_REQUEST.street
+    assert user_details.building == helpers.USER_REGISTER_REQUEST.building
+    assert user_details.city == helpers.USER_REGISTER_REQUEST.city
+    assert user_details.postal_code == helpers.USER_REGISTER_REQUEST.postal_code
+    assert user_details.country == helpers.USER_REGISTER_REQUEST.country
+
+
+def test_get_user_details_id_does_not_exist_fail():
+    s = Service.User()
+    r_resp = helpers.register_user(s)
+    user_details = s.GetUserDetails(
+        ReqGetUserDetails(id="1111"),
+        None,
+    )
+    assert user_details.username == ""
+    assert user_details.email == ""
+    assert user_details.name == ""
+    assert user_details.surname == ""
+    assert user_details.street == ""
+    assert user_details.building == ""
+    assert user_details.city == ""
+    assert user_details.postal_code == ""
+    assert user_details.country == ""
+
+
+def test_update_password_user_success():
+    s = Service.User()
+    r_resp = helpers.register_user(s)
+    a_resp = s.Authenticate(
+        AuthUser(
+            login=helpers.USER_REGISTER_REQUEST.email,
+            password=helpers.USER_REGISTER_REQUEST.password,
+        ),
+        None,
+    )
+
+    u_resp = s.Update(
+        ReqUpdateUser(
+            id=a_resp.id,
+            password="NewPass",
+        ),
+        None,
+    )
+
+    a_np_resp = s.Authenticate(
+        AuthUser(
+            login=helpers.USER_REGISTER_REQUEST.email,
+            password="NewPass",
+        ),
+        None,
+    )
+
+    assert a_resp.success == True
+
+    assert u_resp.success == True
+    assert u_resp.id == a_resp.id
+
+    assert a_np_resp.success == True
+    assert a_np_resp.id == a_resp.id
+    assert a_np_resp.email == helpers.USER_REGISTER_REQUEST.email
+    assert a_np_resp.username == helpers.USER_REGISTER_REQUEST.username
+
+
+def test_update_password_user_fail():
+    s = Service.User()
+    r_resp = helpers.register_user(s)
+    a_resp = s.Authenticate(
+        AuthUser(
+            login=helpers.USER_REGISTER_REQUEST.email,
+            password=helpers.USER_REGISTER_REQUEST.password,
+        ),
+        None,
+    )
+
+    u_resp = s.Update(
+        ReqUpdateUser(
+            id="12213312",
+            password="NewPass",
+        ),
+        None,
+    )
+
+    assert u_resp.success == False
+    assert u_resp.id == ""
+
+
+def test_update_user_details_success():
+    s = Service.User()
+    r_resp = helpers.register_user(s)
+    a_resp = s.Authenticate(
+        AuthUser(
+            login=helpers.USER_REGISTER_REQUEST.email,
+            password=helpers.USER_REGISTER_REQUEST.password,
+        ),
+        None,
+    )
+    u_resp = s.Update(
+        ReqUpdateUser(
+            id=a_resp.id,
+            surname="NewSurname",
+            name="NewName",
+            street="NewStreet",
+            building="NewBuilding",
+            city="NewCity",
+            country="NewCountry",
+            postal_code="NewPostalCode",
+        ),
+        None,
+    )
+
+    user_details = s.GetUserDetails(ReqGetUserDetails(id=a_resp.id), None)
+
+    assert a_resp.success == True
+
+    assert u_resp.success == True
+    assert u_resp.id == a_resp.id
+
+    assert user_details.surname == "NewSurname"
+    assert user_details.name == "NewName"
+    assert user_details.street == "NewStreet"
+    assert user_details.building == "NewBuilding"
+    assert user_details.city == "NewCity"
+    assert user_details.country == "NewCountry"
+    assert user_details.postal_code == "NewPostalCode"
+
+
+def test_update_user_details_and_password_success():
+    s = Service.User()
+    r_resp = helpers.register_user(s)
+    a_resp = s.Authenticate(
+        AuthUser(
+            login=helpers.USER_REGISTER_REQUEST.email,
+            password=helpers.USER_REGISTER_REQUEST.password,
+        ),
+        None,
+    )
+    u_resp = s.Update(
+        ReqUpdateUser(
+            id=a_resp.id,
+            password="NewPass",
+            email="NewUsername@example.com",
+            surname="NewSurname",
+            name="NewName",
+            street="NewStreet",
+            building="NewBuilding",
+            city="NewCity",
+            country="NewCountry",
+            postal_code="NewPostalCode",
+        ),
+        None,
+    )
+
+    a_np_resp = s.Authenticate(
+        AuthUser(
+            login="NewUsername@example.com",
+            password="NewPass",
+        ),
+        None,
+    )
+
+    user_details = s.GetUserDetails(ReqGetUserDetails(id=a_resp.id), None)
+
+    assert u_resp.success == True
+    assert u_resp.id == a_resp.id
+
+    assert a_np_resp.success == True
+    assert a_np_resp.id == a_resp.id
+    assert a_np_resp.email == "NewUsername@example.com"
+    assert a_np_resp.username == helpers.USER_REGISTER_REQUEST.username
+
+    assert user_details.surname == "NewSurname"
+    assert user_details.name == "NewName"
+    assert user_details.street == "NewStreet"
+    assert user_details.building == "NewBuilding"
+    assert user_details.city == "NewCity"
+    assert user_details.country == "NewCountry"
+    assert user_details.postal_code == "NewPostalCode"
+
+
+def test_update_user_failure():
+    s = Service.User()
+    r_resp = helpers.register_user(s)
+    a_resp = s.Authenticate(
+        AuthUser(
+            login=helpers.USER_REGISTER_REQUEST.email,
+            password=helpers.USER_REGISTER_REQUEST.password,
+        ),
+        None,
+    )
+    u_resp = s.Update(
+        ReqUpdateUser(
+            id="12313242",
+            password="NewPass",
+        ),
+        None,
+    )
+
+    assert u_resp.success == False
+    assert u_resp.id == ""
+
+
+def test_login_with_old_password_fail():
+    s = Service.User()
+    helpers.register_user(s)
+    a_resp = s.Authenticate(
+        AuthUser(
+            login=helpers.USER_REGISTER_REQUEST.email,
+            password=helpers.USER_REGISTER_REQUEST.password,
+        ),
+        None,
+    )
+    u_resp = s.Update(
+        ReqUpdateUser(
+            id=a_resp.id,
+            password="NewPass",
+        ),
+        None,
+    )
+    a_old_resp = s.Authenticate(
+        AuthUser(
+            login=helpers.USER_REGISTER_REQUEST.email,
+            password=helpers.USER_REGISTER_REQUEST.password,
+        ),
+        None,
+    )
+
+    assert u_resp.success == True
+    assert u_resp.id == a_resp.id
+
+    assert a_old_resp.success == False
+    assert a_old_resp.id == ""
+    assert a_old_resp.email == ""
+    assert a_old_resp.username == ""
+
+
+def test_delete_user_success():
+    s = Service.User()
+    helpers.register_user(s)
+    a_resp = s.Authenticate(
+        AuthUser(
+            login=helpers.USER_REGISTER_REQUEST.email,
+            password=helpers.USER_REGISTER_REQUEST.password,
+        ),
+        None,
+    )
+    d_resp = s.Delete(
+        ReqDeleteUser(
+            id=a_resp.id,
+            mail=helpers.USER_REGISTER_REQUEST.email,
+            password=helpers.USER_REGISTER_REQUEST.password,
+        ),
+        None,
+    )
+    auth_after_delete = s.Authenticate(
+        AuthUser(
+            login=helpers.USER_REGISTER_REQUEST.email,
+            password=helpers.USER_REGISTER_REQUEST.password,
+        ),
+        None,
+    )
+
+    assert d_resp.success == True
+    assert d_resp.id == a_resp.id
+
+    assert auth_after_delete.success == False
+    assert auth_after_delete.id == ""
+    assert auth_after_delete.email == ""
+    assert auth_after_delete.username == ""
+
+
+def test_delete_user_fail():
+    s = Service.User()
+    helpers.register_user(s)
+    a_resp = s.Authenticate(
+        AuthUser(
+            login=helpers.USER_REGISTER_REQUEST.email,
+            password=helpers.USER_REGISTER_REQUEST.password,
+        ),
+        None,
+    )
+    d_resp = s.Delete(
+        ReqDeleteUser(
+            id="1231341421313",
+            mail=helpers.USER_REGISTER_REQUEST.email,
+            password=helpers.USER_REGISTER_REQUEST.password,
+        ),
+        None,
+    )
+    assert d_resp.success == False
+    assert d_resp.id == ""
