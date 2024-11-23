@@ -12,5 +12,69 @@ env:
   PYTHONPATH: ${{ github.workspace }}
 
 jobs:
-  Test:
-    uses: THD-C/GH_Actions/.github/workflows/run-tests.yml@main
+  Test_Formatting:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install black pytest
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Lint with black
+        run: |
+          # Code formatting with black, check every python file in the src directory 
+          black --check --diff src
+
+  Test_DB:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build docker image
+        run: |
+          docker compose build
+
+      - name: Run docker container
+        run: |
+          docker compose up -d Postgres
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      #Task for installing dependencies, multi-line command
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Download THDc gRPC classes
+        run: |
+          curl -s -L -o thdcgrpc.tar.gz https://github.com/THD-C/Protocol/releases/latest/download/thdcgrpc.tar.gz \
+          && tar -xzf thdcgrpc.tar.gz \
+          && rm thdcgrpc.tar.gz \
+          && cp -r thdcgrpc/* . \
+          && rm -r thdcgrpc
+
+      - name: Test with pytest
+        run: |
+          pytest
