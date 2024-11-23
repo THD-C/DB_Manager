@@ -1,8 +1,9 @@
 from sqlmodel import SQLModel, Field
+from src.DB.BaseDBOpsModel import BaseDBOpsModel
 from datetime import datetime
 
 
-class Transaction(SQLModel, table=True):
+class Transaction(SQLModel, BaseDBOpsModel, table=True):
     __tablename__: str = "transaction"
 
     id: int = Field(primary_key=True, default=None)

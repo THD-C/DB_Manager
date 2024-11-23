@@ -18,7 +18,7 @@ WALLET_3 = Wallet_pb(
 )
 
 def create_wallet(s: Wallet, wallet: Wallet_pb = WALLET_1) -> Wallet_pb:
-    return s.createWallet(
+    return s.CreateWallet(
         wallet,
         None,
     )

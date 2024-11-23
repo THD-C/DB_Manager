@@ -6,7 +6,7 @@ import src.Utils as Utils
 
 
 class Wallet(WalletsServicer):
-    def createWallet(self, request: grpcWallet.Wallet, context) -> grpcWallet.Wallet:
+    def CreateWallet(self, request: grpcWallet.Wallet, context) -> grpcWallet.Wallet:
         wallet = DB.Wallet.create_model(DB.Wallet, request)
         try:
             with DB.Session() as s:
@@ -32,7 +32,7 @@ class Wallet(WalletsServicer):
             return Utils.create_grpc_model(grpcWallet.Wallet, None)
         return Utils.create_grpc_model(grpcWallet.Wallet, wallet)
 
-    def updateWallet(self, request: grpcWallet.Wallet, context) -> grpcWallet.Wallet:
+    def UpdateWallet(self, request: grpcWallet.Wallet, context) -> grpcWallet.Wallet:
         try:
             with DB.Session() as s:
                 wallet = (
@@ -56,7 +56,7 @@ class Wallet(WalletsServicer):
 
         return Utils.create_grpc_model(grpcWallet.Wallet, wallet)
 
-    def deleteWallet(self, request: grpcWallet.WalletID, context):
+    def DeleteWallet(self, request: grpcWallet.WalletID, context):
         try:
             with DB.Session() as s:
                 wallet = s.query(DB.Wallet).filter(DB.Wallet.id == request.id).first()
@@ -67,7 +67,7 @@ class Wallet(WalletsServicer):
 
         return Utils.create_grpc_model(grpcWallet.Wallet, wallet)
 
-    def getWallet(self, request: grpcWallet.WalletID, context) -> grpcWallet.Wallet:
+    def GetWallet(self, request: grpcWallet.WalletID, context) -> grpcWallet.Wallet:
         wallet = None
         try:
             with DB.Session() as s:
@@ -76,7 +76,7 @@ class Wallet(WalletsServicer):
             pass
         return Utils.create_grpc_model(grpcWallet.Wallet, wallet)
 
-    def getUsersWallets(
+    def GetUsersWallets(
         self, request: grpcWallet.UserID, context
     ) -> grpcWallet.WalletList:
         wallets = []
