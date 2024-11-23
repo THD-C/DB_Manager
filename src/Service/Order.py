@@ -50,3 +50,14 @@ class Order(OrderServicer):
         except Exception as e:
             print(e)
         return gRPC.OrderDetails()
+
+    def UpdateOrder(self, request: gRPC.OrderDetails, context):
+        try:
+            with DB.Session() as s:
+                order = s.query(DB.Order).filter_by(id=request.id).first()
+                if order:
+                    order.update(s, DB.Order.create_model(DB.Order, request))
+            return Utils.create_grpc_model(gRPC.OrderDetails, order)
+        except Exception as e:
+            print(e)
+        return gRPC.OrderDetails()
