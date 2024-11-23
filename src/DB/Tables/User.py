@@ -13,7 +13,7 @@ class User(SQLModel, BaseDBOpsModel, table=True):
     password: str = Field(nullable=False)
 
     user_detail_ID: int = Field(
-        foreign_key="user_detail.ID", nullable=True, default=None
+        foreign_key="user_detail.ID", nullable=True, default=None, unique=True
     )
 
     def __eq__(self, other):
