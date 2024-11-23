@@ -252,3 +252,52 @@ def test_delete_order_fail():
     assert del_resp.price == ""
     assert del_resp.type == 0
     assert del_resp.side == 0
+
+
+def test_update_order_success():
+    s = Service.Order()
+    o_resp = helpers.create_order(s)
+    
+    o_resp.status = 1
+    
+    u_resp = s.UpdateOrder(
+        o_resp,
+        None,
+    )
+    
+    g_resp = s.GetOrder(
+        OrderID(
+            id=o_resp.id,
+        ),
+        None,
+    )
+    
+    
+    
+    assert u_resp.id != ""
+    
+    assert g_resp.status == 1
+    assert g_resp.currency == helpers.ORDER_1.currency
+    assert g_resp.nominal == helpers.ORDER_1.nominal
+    assert g_resp.user_id == helpers.ORDER_1.user_id
+    assert g_resp.cash_quantity == helpers.ORDER_1.cash_quantity
+    assert g_resp.price == helpers.ORDER_1.price
+    assert g_resp.type == helpers.ORDER_1.type
+    assert g_resp.side == helpers.ORDER_1.side
+    
+def test_update_order_fail():
+    s = Service.Order()
+    
+    u_resp = s.UpdateOrder(
+        helpers.ORDER_1,
+        None,
+    )
+    assert u_resp.id == ""
+    assert u_resp.status == 0
+    assert u_resp.currency == ""
+    assert u_resp.nominal == ""
+    assert u_resp.user_id == ""
+    assert u_resp.cash_quantity == ""
+    assert u_resp.price == ""
+    assert u_resp.type == 0
+    assert u_resp.side == 0
