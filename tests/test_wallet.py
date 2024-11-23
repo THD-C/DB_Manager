@@ -14,7 +14,7 @@ def setup():
 
 def test_create_wallet_success():
     s = Service.Wallet()
-    w_resp = s.createWallet(
+    w_resp = s.CreateWallet(
         helpers.WALLET_1,
         None,
     )
@@ -27,7 +27,7 @@ def test_create_wallet_success():
 
 def test_create_wallet_fail():
     s = Service.Wallet()
-    w_resp = s.createWallet(
+    w_resp = s.CreateWallet(
         Wallet(
             currency=helpers.WALLET_1.currency,
             value=helpers.WALLET_1.value,
@@ -44,7 +44,7 @@ def test_create_wallet_fail():
 def test_update_wallet_success():
     s = Service.Wallet()
     helpers.create_wallet(s)
-    w_resp = s.updateWallet(
+    w_resp = s.UpdateWallet(
         Wallet(
             id="1",
             currency=helpers.WALLET_2.currency,
@@ -63,7 +63,7 @@ def test_update_wallet_success():
 def test_update_wallet_success():
     s = Service.Wallet()
     helpers.create_wallet(s)
-    w_resp = s.updateWallet(
+    w_resp = s.UpdateWallet(
         Wallet(
             id="1",
             currency=helpers.WALLET_2.currency,
@@ -81,7 +81,7 @@ def test_update_wallet_success():
 def test_update_wallet_fail():
     s = Service.Wallet()
     helpers.create_wallet(s)
-    w_resp = s.updateWallet(
+    w_resp = s.UpdateWallet(
         Wallet(
             currency=helpers.WALLET_2.currency,
             value=helpers.WALLET_2.currency,
@@ -102,7 +102,7 @@ def test_delete_wallet_success():
     helpers.create_wallet(s, helpers.WALLET_2)
     helpers.create_wallet(s, helpers.WALLET_3)
 
-    w_resp = s.deleteWallet(
+    w_resp = s.DeleteWallet(
         WalletID(
             id="2",
         ),
@@ -121,7 +121,7 @@ def test_delete_wallet_fail():
     helpers.create_wallet(s, helpers.WALLET_2)
     helpers.create_wallet(s, helpers.WALLET_3)
 
-    w_resp = s.deleteWallet(
+    w_resp = s.DeleteWallet(
         WalletID(
             id="1234567",
         ),
@@ -140,7 +140,7 @@ def test_get_wallet_2_success():
     helpers.create_wallet(s, helpers.WALLET_2)
     helpers.create_wallet(s, helpers.WALLET_3)
 
-    w_resp = s.getWallet(
+    w_resp = s.GetWallet(
         WalletID(
             id="2",
         ),
@@ -159,7 +159,7 @@ def test_get_wallet_3_success():
     helpers.create_wallet(s, helpers.WALLET_2)
     helpers.create_wallet(s, helpers.WALLET_3)
 
-    w_resp = s.getWallet(
+    w_resp = s.GetWallet(
         WalletID(
             id="3",
         ),
@@ -178,7 +178,7 @@ def test_get_wallet_fail():
     helpers.create_wallet(s, helpers.WALLET_2)
     helpers.create_wallet(s, helpers.WALLET_3)
 
-    w_resp = s.getWallet(
+    w_resp = s.GetWallet(
         WalletID(
             id="123457898764",
         ),
@@ -197,7 +197,7 @@ def test_get_user_wallet_list_3_success():
     helpers.create_wallet(s, helpers.WALLET_2)
     helpers.create_wallet(s, helpers.WALLET_3)
 
-    w_resp = s.getUsersWallets(
+    w_resp = s.GetUsersWallets(
         UserID(
             id="1",
         ),
@@ -232,7 +232,7 @@ def test_get_user_wallet_list_2_success():
     helpers.create_wallet(s)
     helpers.create_wallet(s, helpers.WALLET_2)
 
-    w_resp = s.getUsersWallets(
+    w_resp = s.GetUsersWallets(
         UserID(
             id="1",
         ),
@@ -261,7 +261,7 @@ def test_get_user_wallet_list_1_success():
     s = Service.Wallet()
     helpers.create_wallet(s)
 
-    w_resp = s.getUsersWallets(
+    w_resp = s.GetUsersWallets(
         UserID(
             id="1",
         ),
@@ -286,7 +286,7 @@ def test_get_user_wallet_list_fail():
     s = Service.Wallet()
     helpers.create_wallet(s)
 
-    w_resp = s.getUsersWallets(
+    w_resp = s.GetUsersWallets(
         UserID(
             id="12345678",
         ),
