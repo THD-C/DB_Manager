@@ -3,7 +3,7 @@ import src.Service as Service
 import src.DB as DB
 import tests.helpers as helpers
 
-from user.user_pb2 import AuthUser, ReqGetUserDetails, ReqDeleteUser, ReqUpdateUser
+from user.user_pb2 import RegUser, AuthUser, ReqGetUserDetails, ReqDeleteUser, ReqUpdateUser
 
 
 @pytest.fixture(autouse=True)
@@ -23,8 +23,8 @@ def test_register_success():
         None,
     )
 
-    assert r_resp.success == True
-    assert a_resp.success == True
+    assert r_resp.success is True
+    assert a_resp.success is True
     assert a_resp.email == helpers.USER_REGISTER_REQUEST.email
     assert a_resp.username == helpers.USER_REGISTER_REQUEST.username
 
@@ -34,8 +34,8 @@ def test_register_fail():
     r_resp = helpers.register_user(s)
     r_resp2 = helpers.register_user(s)
 
-    assert r_resp.success == True
-    assert r_resp2.success == False
+    assert r_resp.success is True
+    assert r_resp2.success is False
 
 
 def test_login_with_email_success():
@@ -49,7 +49,7 @@ def test_login_with_email_success():
         None,
     )
 
-    assert a_resp.success == True
+    assert a_resp.success is True
     assert a_resp.email == helpers.USER_REGISTER_REQUEST.email
     assert a_resp.username == helpers.USER_REGISTER_REQUEST.username
 
@@ -65,7 +65,7 @@ def test_login_with_username_success():
         None,
     )
 
-    assert a_resp.success == True
+    assert a_resp.success is True
     assert a_resp.email == helpers.USER_REGISTER_REQUEST.email
     assert a_resp.username == helpers.USER_REGISTER_REQUEST.username
 
@@ -81,7 +81,7 @@ def test_login_without_email_1_fail():
         None,
     )
 
-    assert a_resp.success == False
+    assert a_resp.success is False
 
 
 def test_login_without_email_2_fail():
@@ -95,7 +95,7 @@ def test_login_without_email_2_fail():
         None,
     )
 
-    assert a_resp.success == False
+    assert a_resp.success is False
 
 
 def test_login_without_password_fail():
@@ -109,7 +109,7 @@ def test_login_without_password_fail():
         None,
     )
 
-    assert a_resp.success == False
+    assert a_resp.success is False
 
 
 def test_login_with_wrong_password_fail():
@@ -122,12 +122,12 @@ def test_login_with_wrong_password_fail():
         ),
         None,
     )
-    assert a_resp.success == False
+    assert a_resp.success is False
 
 
 def test_get_user_details_success():
     s = Service.User()
-    r_resp = helpers.register_user(s)
+    helpers.register_user(s)
     a_resp = s.Authenticate(
         AuthUser(
             login=helpers.USER_REGISTER_REQUEST.email,
@@ -152,7 +152,7 @@ def test_get_user_details_success():
 
 def test_get_user_details_id_does_not_exist_fail():
     s = Service.User()
-    r_resp = helpers.register_user(s)
+    helpers.register_user(s)
     user_details = s.GetUserDetails(
         ReqGetUserDetails(id="1111"),
         None,
@@ -170,7 +170,7 @@ def test_get_user_details_id_does_not_exist_fail():
 
 def test_update_password_user_success():
     s = Service.User()
-    r_resp = helpers.register_user(s)
+    helpers.register_user(s)
     a_resp = s.Authenticate(
         AuthUser(
             login=helpers.USER_REGISTER_REQUEST.email,
@@ -195,12 +195,12 @@ def test_update_password_user_success():
         None,
     )
 
-    assert a_resp.success == True
+    assert a_resp.success is True
 
-    assert u_resp.success == True
+    assert u_resp.success is True
     assert u_resp.id == a_resp.id
 
-    assert a_np_resp.success == True
+    assert a_np_resp.success is True
     assert a_np_resp.id == a_resp.id
     assert a_np_resp.email == helpers.USER_REGISTER_REQUEST.email
     assert a_np_resp.username == helpers.USER_REGISTER_REQUEST.username
@@ -208,8 +208,8 @@ def test_update_password_user_success():
 
 def test_update_password_user_fail():
     s = Service.User()
-    r_resp = helpers.register_user(s)
-    a_resp = s.Authenticate(
+    helpers.register_user(s)
+    s.Authenticate(
         AuthUser(
             login=helpers.USER_REGISTER_REQUEST.email,
             password=helpers.USER_REGISTER_REQUEST.password,
@@ -225,13 +225,13 @@ def test_update_password_user_fail():
         None,
     )
 
-    assert u_resp.success == False
+    assert u_resp.success is False
     assert u_resp.id == ""
 
 
 def test_update_user_details_success():
     s = Service.User()
-    r_resp = helpers.register_user(s)
+    helpers.register_user(s)
     a_resp = s.Authenticate(
         AuthUser(
             login=helpers.USER_REGISTER_REQUEST.email,
@@ -255,9 +255,9 @@ def test_update_user_details_success():
 
     user_details = s.GetUserDetails(ReqGetUserDetails(id=a_resp.id), None)
 
-    assert a_resp.success == True
+    assert a_resp.success is True
 
-    assert u_resp.success == True
+    assert u_resp.success is True
     assert u_resp.id == a_resp.id
 
     assert user_details.surname == "NewSurname"
@@ -271,7 +271,7 @@ def test_update_user_details_success():
 
 def test_update_user_details_and_password_success():
     s = Service.User()
-    r_resp = helpers.register_user(s)
+    helpers.register_user(s)
     a_resp = s.Authenticate(
         AuthUser(
             login=helpers.USER_REGISTER_REQUEST.email,
@@ -305,10 +305,10 @@ def test_update_user_details_and_password_success():
 
     user_details = s.GetUserDetails(ReqGetUserDetails(id=a_resp.id), None)
 
-    assert u_resp.success == True
+    assert u_resp.success is True
     assert u_resp.id == a_resp.id
 
-    assert a_np_resp.success == True
+    assert a_np_resp.success is True
     assert a_np_resp.id == a_resp.id
     assert a_np_resp.email == "NewUsername@example.com"
     assert a_np_resp.username == helpers.USER_REGISTER_REQUEST.username
@@ -324,8 +324,8 @@ def test_update_user_details_and_password_success():
 
 def test_update_user_failure():
     s = Service.User()
-    r_resp = helpers.register_user(s)
-    a_resp = s.Authenticate(
+    helpers.register_user(s)
+    s.Authenticate(
         AuthUser(
             login=helpers.USER_REGISTER_REQUEST.email,
             password=helpers.USER_REGISTER_REQUEST.password,
@@ -340,7 +340,7 @@ def test_update_user_failure():
         None,
     )
 
-    assert u_resp.success == False
+    assert u_resp.success is False
     assert u_resp.id == ""
 
 
@@ -369,10 +369,10 @@ def test_login_with_old_password_fail():
         None,
     )
 
-    assert u_resp.success == True
+    assert u_resp.success is True
     assert u_resp.id == a_resp.id
 
-    assert a_old_resp.success == False
+    assert a_old_resp.success is False
     assert a_old_resp.id == ""
     assert a_old_resp.email == ""
     assert a_old_resp.username == ""
@@ -404,10 +404,10 @@ def test_delete_user_success():
         None,
     )
 
-    assert d_resp.success == True
+    assert d_resp.success is True
     assert d_resp.id == a_resp.id
 
-    assert auth_after_delete.success == False
+    assert auth_after_delete.success is False
     assert auth_after_delete.id == ""
     assert auth_after_delete.email == ""
     assert auth_after_delete.username == ""
@@ -416,7 +416,7 @@ def test_delete_user_success():
 def test_delete_user_fail():
     s = Service.User()
     helpers.register_user(s)
-    a_resp = s.Authenticate(
+    s.Authenticate(
         AuthUser(
             login=helpers.USER_REGISTER_REQUEST.email,
             password=helpers.USER_REGISTER_REQUEST.password,
@@ -431,5 +431,5 @@ def test_delete_user_fail():
         ),
         None,
     )
-    assert d_resp.success == False
+    assert d_resp.success is False
     assert d_resp.id == ""

@@ -4,7 +4,7 @@ import src.DB as DB
 import tests.helpers as helpers
 
 
-from order.order_pb2 import OrderDetails, OrderID
+from order.order_pb2 import OrderID
 
 
 @pytest.fixture(autouse=True)
