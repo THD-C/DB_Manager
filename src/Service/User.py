@@ -99,9 +99,15 @@ class User(UserServicer):
                     .filter(DB.UserDetail.ID == db_user.user_detail_ID)
                     .first()
                 )
-                db_user_detail.update(
-                    s, DB.UserDetail.create_model(DB.UserDetail, request)
-                )
+                if db_user_detail is not None:
+                    db_user_detail.update(
+                        s, DB.UserDetail.create_model(DB.UserDetail, request)
+                    )
+                else:
+                    db_user_detail = DB.UserDetail.create_model(DB.UserDetail, request)
+                    db_user_detail.insert(s)
+                    db_user.user_detail_ID = db_user_detail.ID
+                    db_user.update(s, db_user)
             except Exception as e:
                 print(e)
                 error = True
