@@ -3,7 +3,13 @@ import src.Service as Service
 import src.DB as DB
 import tests.helpers as helpers
 
-from user.user_pb2 import RegUser, AuthUser, ReqGetUserDetails, ReqDeleteUser, ReqUpdateUser
+from user.user_pb2 import (
+    RegUser,
+    AuthUser,
+    ReqGetUserDetails,
+    ReqDeleteUser,
+    ReqUpdateUser,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -28,6 +34,7 @@ def test_register_success():
     assert a_resp.email == helpers.USER_REGISTER_REQUEST.email
     assert a_resp.username == helpers.USER_REGISTER_REQUEST.username
 
+
 def test_register_without_user_details_success():
     s = Service.User()
     r_resp = s.Register(
@@ -35,7 +42,7 @@ def test_register_without_user_details_success():
             email=helpers.USER_REGISTER_REQUEST.email,
             username=helpers.USER_REGISTER_REQUEST.username,
             password=helpers.USER_REGISTER_REQUEST.password,
-            ),
+        ),
         None,
     )
     a_resp = s.Authenticate(
@@ -50,6 +57,7 @@ def test_register_without_user_details_success():
     assert a_resp.success is True
     assert a_resp.email == helpers.USER_REGISTER_REQUEST.email
     assert a_resp.username == helpers.USER_REGISTER_REQUEST.username
+
 
 def test_register_fail():
     s = Service.User()
@@ -282,6 +290,71 @@ def test_update_user_details_success():
     assert u_resp.success is True
     assert u_resp.id == a_resp.id
 
+    assert user_details.surname == "NewSurname"
+    assert user_details.name == "NewName"
+    assert user_details.street == "NewStreet"
+    assert user_details.building == "NewBuilding"
+    assert user_details.city == "NewCity"
+    assert user_details.country == "NewCountry"
+    assert user_details.postal_code == "NewPostalCode"
+
+
+def test_update_user_details_without_details_created_on_registration():
+    s = Service.User()
+    r_resp = s.Register(
+        RegUser(
+            email=helpers.USER_REGISTER_REQUEST.email,
+            username=helpers.USER_REGISTER_REQUEST.username,
+            password=helpers.USER_REGISTER_REQUEST.password,
+        ),
+        None,
+    )
+    a_resp = s.Authenticate(
+        AuthUser(
+            login=helpers.USER_REGISTER_REQUEST.email,
+            password=helpers.USER_REGISTER_REQUEST.password,
+        ),
+        None,
+    )
+
+    u_resp = s.Update(
+        ReqUpdateUser(
+            id=a_resp.id,
+            password="NewPass",
+            email="NewUsername@example.com",
+            surname="NewSurname",
+            name="NewName",
+            street="NewStreet",
+            building="NewBuilding",
+            city="NewCity",
+            country="NewCountry",
+            postal_code="NewPostalCode",
+        ),
+        None,
+    )
+    
+    
+    a_np_resp = s.Authenticate(
+        AuthUser(
+            login="NewUsername@example.com",
+            password="NewPass",
+        ),
+        None,
+    )
+
+    user_details = s.GetUserDetails(ReqGetUserDetails(id=a_resp.id), None)
+
+    assert r_resp.success is True
+    assert a_resp.success is True
+    assert a_resp.email == helpers.USER_REGISTER_REQUEST.email
+    assert a_resp.username == helpers.USER_REGISTER_REQUEST.username
+    
+    assert u_resp.success is True
+    assert u_resp.id == a_resp.id
+    
+    assert a_np_resp.success is True
+    assert a_np_resp.id == a_resp.id
+    
     assert user_details.surname == "NewSurname"
     assert user_details.name == "NewName"
     assert user_details.street == "NewStreet"
