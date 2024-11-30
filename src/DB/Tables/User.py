@@ -1,7 +1,6 @@
 from sqlmodel import SQLModel, Field
 from user.user_pb2 import AuthUser
 from src.DB.BaseDBOpsModel import BaseDBOpsModel
-import src.Utils as Utils
 
 
 class User(SQLModel, BaseDBOpsModel, table=True):

@@ -1,6 +1,5 @@
 from sqlmodel import SQLModel, Field
 from src.DB.BaseDBOpsModel import BaseDBOpsModel
-import src.Utils as Utils
 
 
 class UserDetail(SQLModel, BaseDBOpsModel, table=True):
