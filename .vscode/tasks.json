@@ -2,9 +2,33 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "download_thdcgrpc",
-            "command": "curl -s -L -o thdcgrpc.tar.gz https://github.com/THD-C/Protocol/releases/latest/download/thdcgrpc.tar.gz && tar -xzf thdcgrpc.tar.gz && rm thdcgrpc.tar.gz && cp -r thdcgrpc/* . && rm -r thdcgrpc", 
+            "label": "configure Python env",
+            "command": "./.vscode/scripts/configure_python_env.sh", 
             "type": "shell"
+        },
+        {
+            "label": "download gRPC",
+            "command": "./.vscode/scripts/download_gRPC.sh", 
+            "type": "shell"
+        },
+        {
+            "label": "run docker",
+            "command": "./.vscode/scripts/run_docker.sh",
+            "type": "shell"
+        },
+        {
+            "label": "stop docker",
+            "command": "docker compose down",
+            "type": "shell"
+        },
+        {
+            "label": "Build Python Project",
+            "dependsOrder": "parallel",
+            "dependsOn": [
+                "download gRPC",
+                "configure Python env",
+                "run docker"
+            ]
         }
     ]
 }
