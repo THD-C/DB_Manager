@@ -21,17 +21,18 @@ class User(UserServicer):
 
         user_details = DB.UserDetail.create_model(DB.UserDetail, request)
         user = DB.User.create_model(DB.User, request)
-        try:
-            with DB.Session() as s:
+        with DB.Session() as s:
+            try:
                 user.insert(s)
-                user_details.insert(s)
-                user.user_detail_ID = user_details.ID
-                user.update(s, user)
-            return RegResponse(success=True)
-        except Exception as e:
-            print(e)
+                if not user_details.check_all_attributes_are_none():
+                    user_details.insert(s)
+                    user.user_detail_ID = user_details.ID
+                    user.update(s, user)
+                return RegResponse(success=True)
+            except Exception as e:
+                print(e)
 
-            return RegResponse(success=False)
+        return RegResponse(success=False)
 
     def Authenticate(self, request: AuthUser, context):
         with DB.Session() as s:
@@ -98,9 +99,15 @@ class User(UserServicer):
                     .filter(DB.UserDetail.ID == db_user.user_detail_ID)
                     .first()
                 )
-                db_user_detail.update(
-                    s, DB.UserDetail.create_model(DB.UserDetail, request)
-                )
+                if db_user_detail is not None:
+                    db_user_detail.update(
+                        s, DB.UserDetail.create_model(DB.UserDetail, request)
+                    )
+                else:
+                    db_user_detail = DB.UserDetail.create_model(DB.UserDetail, request)
+                    db_user_detail.insert(s)
+                    db_user.user_detail_ID = db_user_detail.ID
+                    db_user.update(s, db_user)
             except Exception as e:
                 print(e)
                 error = True

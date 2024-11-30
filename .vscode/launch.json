@@ -9,12 +9,12 @@
             "console": "integratedTerminal",
         },
         {
-            "preLaunchTask": "download_thdcgrpc",
+            "preLaunchTask": "Build Python Project",
             "name": "DB_manager",
             "type": "debugpy",
             "request": "launch",
             "program": "main.py",
             "console": "integratedTerminal",
-        }
+        },
     ]
 }

@@ -48,26 +48,8 @@ def test_update_wallet_success():
         Wallet(
             id="1",
             currency=helpers.WALLET_2.currency,
-            value=helpers.WALLET_2.currency,
-            user_id=helpers.WALLET_1.user_id,
-        ),
-        None,
-    )
-
-    assert w_resp.id == "1"
-    assert w_resp.currency == helpers.WALLET_2.currency
-    assert w_resp.value == helpers.WALLET_2.value
-    assert w_resp.user_id == helpers.WALLET_1.user_id
-
-
-def test_update_wallet_success():
-    s = Service.Wallet()
-    helpers.create_wallet(s)
-    w_resp = s.UpdateWallet(
-        Wallet(
-            id="1",
-            currency=helpers.WALLET_2.currency,
             value=helpers.WALLET_2.value,
+            user_id=helpers.WALLET_1.user_id,
         ),
         None,
     )

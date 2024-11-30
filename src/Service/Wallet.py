@@ -63,6 +63,7 @@ class Wallet(WalletsServicer):
                 if wallet:
                     wallet.delete(s)
         except Exception as e:
+            print(e)
             wallet.id = None
 
         return Utils.create_grpc_model(grpcWallet.Wallet, wallet)
@@ -73,7 +74,7 @@ class Wallet(WalletsServicer):
             with DB.Session() as s:
                 wallet = s.query(DB.Wallet).filter(DB.Wallet.id == request.id).first()
         except Exception as e:
-            pass
+            print(e)
         return Utils.create_grpc_model(grpcWallet.Wallet, wallet)
 
     def GetUsersWallets(

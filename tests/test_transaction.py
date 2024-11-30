@@ -208,7 +208,7 @@ def test_delete_transaction_success():
 def test_delete_transaction_fail():
     s = Service.Transaction()
 
-    t_resp = helpers.create_transaction(s)
+    helpers.create_transaction(s)
 
     d_resp = s.DeleteTransaction(
         TransactionID(
@@ -226,7 +226,7 @@ def test_delete_transaction_fail():
 def test_delete_transaction_null_id_fail():
     s = Service.Transaction()
 
-    t_resp = helpers.create_transaction(s)
+    helpers.create_transaction(s)
 
     d_resp = s.DeleteTransaction(
         TransactionID(
