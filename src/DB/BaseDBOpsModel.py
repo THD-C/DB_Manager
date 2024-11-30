@@ -29,7 +29,7 @@ class BaseDBOpsModel:
             else:
                 data[field] = None
         return model_class(**data)
-    
+
     def check_all_attributes_are_none(self):
         fields: list[str] = self.__get_model_fields(self.__class__)
         field_values = [getattr(self, f) for f in fields]
