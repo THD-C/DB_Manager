@@ -28,6 +28,28 @@ def test_register_success():
     assert a_resp.email == helpers.USER_REGISTER_REQUEST.email
     assert a_resp.username == helpers.USER_REGISTER_REQUEST.username
 
+def test_register_without_user_details_success():
+    s = Service.User()
+    r_resp = s.Register(
+        RegUser(
+            email=helpers.USER_REGISTER_REQUEST.email,
+            username=helpers.USER_REGISTER_REQUEST.username,
+            password=helpers.USER_REGISTER_REQUEST.password,
+            ),
+        None,
+    )
+    a_resp = s.Authenticate(
+        AuthUser(
+            login=helpers.USER_REGISTER_REQUEST.email,
+            password=helpers.USER_REGISTER_REQUEST.password,
+        ),
+        None,
+    )
+
+    assert r_resp.success is True
+    assert a_resp.success is True
+    assert a_resp.email == helpers.USER_REGISTER_REQUEST.email
+    assert a_resp.username == helpers.USER_REGISTER_REQUEST.username
 
 def test_register_fail():
     s = Service.User()
