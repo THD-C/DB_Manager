@@ -114,7 +114,7 @@ class User(UserServicer):
             if db_user is None:
                 return ResultResponse(success=False)
 
-            if request.email or request.password:
+            if request.email:
                 try:
                     db_user.update(s, DB.User.create_model(DB.User, request))
                 except Exception as e:
