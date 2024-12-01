@@ -69,14 +69,20 @@ class User(UserServicer):
                 .first()
             )
 
-            return Utils.create_grpc_model(
-                UserDetails,
-                {
-                    **db_user_detail.model_dump(),
-                    "username": db_user.username,
-                    "email": db_user.email,
-                },
+        if db_user_detail is None:
+            return UserDetails(
+                username=db_user.username,
+                email=db_user.email,
             )
+
+        return Utils.create_grpc_model(
+            UserDetails,
+            {
+                **db_user_detail.model_dump(),
+                "username": db_user.username,
+                "email": db_user.email,
+            },
+        )
 
     def Update(self, request: ReqUpdateUser, context):
         error: bool = False

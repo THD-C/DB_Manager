@@ -21,6 +21,9 @@
     "uvicorn",
     "verceldb"
   ],
+  "[python]": {
+    "editor.formatOnSave": true,
+  },
   "python.testing.pytestArgs": [
     "tests"
   ],
