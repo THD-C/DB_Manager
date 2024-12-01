@@ -9,6 +9,7 @@ from user.user_pb2 import (
     ReqGetUserDetails,
     ReqDeleteUser,
     ReqUpdateUser,
+    ChangePass,
 )
 
 
@@ -33,6 +34,69 @@ def test_register_success():
     assert a_resp.success is True
     assert a_resp.email == helpers.USER_REGISTER_REQUEST.email
     assert a_resp.username == helpers.USER_REGISTER_REQUEST.username
+
+
+def test_change_user_password_success():
+    s = Service.User()
+    r_resp = helpers.register_user(s)
+    a_resp = s.Authenticate(
+        AuthUser(
+            login=helpers.USER_REGISTER_REQUEST.email,
+            password=helpers.USER_REGISTER_REQUEST.password,
+        ),
+        None,
+    )
+    chg_resp = s.ChangePassword(
+        ChangePass(
+            login=helpers.USER_REGISTER_REQUEST.email,
+            old_password=helpers.USER_REGISTER_REQUEST.password,
+            new_password="NewPass",
+        ),
+        None,
+    )
+
+    a_after_chg = s.Authenticate(
+        AuthUser(
+            login=helpers.USER_REGISTER_REQUEST.email,
+            password="NewPass",
+        ),
+        None,
+    )
+
+    assert r_resp.success is True
+    assert a_resp.success is True
+    assert a_resp.email == helpers.USER_REGISTER_REQUEST.email
+    assert a_resp.username == helpers.USER_REGISTER_REQUEST.username
+
+    assert chg_resp.success is True
+    assert a_after_chg.success is True
+
+
+def test_change_user_password_fail():
+    s = Service.User()
+    r_resp = helpers.register_user(s)
+    a_resp = s.Authenticate(
+        AuthUser(
+            login=helpers.USER_REGISTER_REQUEST.email,
+            password=helpers.USER_REGISTER_REQUEST.password,
+        ),
+        None,
+    )
+    chg_resp = s.ChangePassword(
+        ChangePass(
+            login=helpers.USER_REGISTER_REQUEST.email,
+            old_password="failed_password",
+            new_password="NewPass",
+        ),
+        None,
+    )
+
+    assert r_resp.success is True
+    assert a_resp.success is True
+    assert a_resp.email == helpers.USER_REGISTER_REQUEST.email
+    assert a_resp.username == helpers.USER_REGISTER_REQUEST.username
+
+    assert chg_resp.success is False
 
 
 def test_register_without_user_details_success():
@@ -234,44 +298,6 @@ def test_get_user_details_id_does_not_exist_fail():
     assert user_details.city == ""
     assert user_details.postal_code == ""
     assert user_details.country == ""
-
-
-def test_update_password_user_success():
-    s = Service.User()
-    helpers.register_user(s)
-    a_resp = s.Authenticate(
-        AuthUser(
-            login=helpers.USER_REGISTER_REQUEST.email,
-            password=helpers.USER_REGISTER_REQUEST.password,
-        ),
-        None,
-    )
-
-    u_resp = s.Update(
-        ReqUpdateUser(
-            id=a_resp.id,
-            password="NewPass",
-        ),
-        None,
-    )
-
-    a_np_resp = s.Authenticate(
-        AuthUser(
-            login=helpers.USER_REGISTER_REQUEST.email,
-            password="NewPass",
-        ),
-        None,
-    )
-
-    assert a_resp.success is True
-
-    assert u_resp.success is True
-    assert u_resp.id == a_resp.id
-
-    assert a_np_resp.success is True
-    assert a_np_resp.id == a_resp.id
-    assert a_np_resp.email == helpers.USER_REGISTER_REQUEST.email
-    assert a_np_resp.username == helpers.USER_REGISTER_REQUEST.username
 
 
 def test_update_password_user_fail():
@@ -479,17 +505,18 @@ def test_update_user_failure():
 def test_login_with_old_password_fail():
     s = Service.User()
     helpers.register_user(s)
-    a_resp = s.Authenticate(
+    s.Authenticate(
         AuthUser(
             login=helpers.USER_REGISTER_REQUEST.email,
             password=helpers.USER_REGISTER_REQUEST.password,
         ),
         None,
     )
-    u_resp = s.Update(
-        ReqUpdateUser(
-            id=a_resp.id,
-            password="NewPass",
+    u_resp = s.ChangePassword(
+        ChangePass(
+            login=helpers.USER_REGISTER_REQUEST.email,
+            old_password=helpers.USER_REGISTER_REQUEST.password,
+            new_password="NewPass",
         ),
         None,
     )
@@ -502,7 +529,6 @@ def test_login_with_old_password_fail():
     )
 
     assert u_resp.success is True
-    assert u_resp.id == a_resp.id
 
     assert a_old_resp.success is False
     assert a_old_resp.id == ""
