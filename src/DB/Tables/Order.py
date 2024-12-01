@@ -8,6 +8,7 @@ class Order(SQLModel, BaseDBOpsModel, table=True):
 
     id: int = Field(primary_key=True, default=None)
     user_id: int = Field(foreign_key="user.ID", nullable=False)
+    wallet_id: int = Field(foreign_key="wallet.id", nullable=False)
     date_created: datetime = Field()
     date_executed: datetime = Field()
     status: str = Field()  # enum
