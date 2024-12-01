@@ -1,7 +1,8 @@
 from order.order_pb2 import OrderDetails
 import datetime
 from google.protobuf.timestamp_pb2 import Timestamp
-from src.Service import Order
+from src.Service import Order, Wallet
+from tests.helpers.wallet_functions import WALLET_1
 
 dateCreated = Timestamp()
 dateCreated.FromDatetime(datetime.datetime(2021, 1, 1))
@@ -10,6 +11,7 @@ dateExecuted.FromDatetime(datetime.datetime(2021, 1, 1))
 
 ORDER_1 = OrderDetails(
     user_id="1",
+    wallet_id="1",
     date_created=dateCreated,
     date_executed=dateExecuted,
     status=0,
@@ -22,6 +24,7 @@ ORDER_1 = OrderDetails(
 )
 ORDER_2 = OrderDetails(
     user_id="1",
+    wallet_id="1",
     date_created=dateCreated,
     date_executed=dateExecuted,
     status=3,
@@ -34,6 +37,7 @@ ORDER_2 = OrderDetails(
 )
 ORDER_3 = OrderDetails(
     user_id="1",
+    wallet_id="1",
     date_created=dateCreated,
     date_executed=dateExecuted,
     status=5,
@@ -45,7 +49,13 @@ ORDER_3 = OrderDetails(
     side=1,
 )
 
+
 def create_order(s: Order, order: OrderDetails = ORDER_1) -> OrderDetails:
+    sw = Wallet()
+    sw.CreateWallet(
+        WALLET_1,
+        None,
+    )
     return s.CreateOrder(
         order,
         None,
