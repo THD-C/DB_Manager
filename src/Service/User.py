@@ -8,6 +8,7 @@ from user.user_pb2 import (
     ReqGetUserDetails,
     UserDetails,
     ResultResponse,
+    ChangePass,
 )
 from sqlalchemy import or_
 
@@ -16,6 +17,27 @@ import src.Utils as Utils
 
 
 class User(UserServicer):
+
+    def ChangePassword(self, request: ChangePass, context):
+
+        response: AuthResponse = self.Authenticate(
+            AuthUser(login=request.login, password=request.old_password), context
+        )
+        if response.success:
+            try:
+                self.Update(
+                    ReqUpdateUser(
+                        id=response.id,
+                        password=request.new_password,
+                    ),
+                    context,
+                )
+                return ResultResponse(success=True)
+            except Exception as e:
+                print(e)
+                return ResultResponse(success=False)
+
+        return ResultResponse(success=False)
 
     def Register(self, request, context):
 
