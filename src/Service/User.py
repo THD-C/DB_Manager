@@ -24,18 +24,22 @@ class User(UserServicer):
             AuthUser(login=request.login, password=request.old_password), context
         )
         if response.success:
-            try:
-                self.Update(
-                    ReqUpdateUser(
-                        id=response.id,
-                        password=request.new_password,
-                    ),
-                    context,
-                )
-                return ResultResponse(success=True)
-            except Exception as e:
-                print(e)
-                return ResultResponse(success=False)
+            with DB.Session() as s:
+                try:
+                    db_user = s.query(DB.User).filter(DB.User.ID == response.id).first()
+                    db_user.update(
+                        s,
+                        DB.User.create_model(
+                            DB.User,
+                            ReqUpdateUser(
+                                id=response.id, password=request.new_password
+                            ),
+                        ),
+                    )
+                    return ResultResponse(success=True)
+                except Exception as e:
+                    print(e)
+                    return ResultResponse(success=False)
 
         return ResultResponse(success=False)
 
