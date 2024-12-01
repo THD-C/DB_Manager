@@ -68,7 +68,7 @@ class User(UserServicer):
                 .filter(DB.UserDetail.ID == db_user.user_detail_ID)
                 .first()
             )
-            
+
         if db_user_detail is None:
             return UserDetails(
                 username=db_user.username,
