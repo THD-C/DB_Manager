@@ -1,5 +1,5 @@
 from sqlmodel import SQLModel, Field
-from datetime import datetime, UTC
+from datetime import datetime
 from src.DB.BaseDBOpsModel import BaseDBOpsModel
 
 
@@ -10,10 +10,9 @@ class Order(SQLModel, BaseDBOpsModel, table=True):
     user_id: int = Field(foreign_key="user.ID", nullable=False)
     fiat_wallet_id: int = Field(foreign_key="wallet.id", nullable=False)
     crypto_wallet_id: int = Field(foreign_key="wallet.id", nullable=False)
-    date_created: datetime = Field(default_factory=datetime.now(UTC))
+    date_created: datetime = Field(default_factory=datetime.now)
     date_executed: datetime = Field()
     status: str = Field()  # enum
-    currency: str = Field()
     nominal: float = Field()
     cash_quantity: float = Field()
     price: float = Field()
