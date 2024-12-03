@@ -16,7 +16,7 @@ class Order(SQLModel, BaseDBOpsModel, table=True):
     date_executed: datetime = Field(default=DEFAULT_DATE_EXECUTED)
     status: str = Field()  # enum
     nominal: float = Field()
-    cash_quantity: float = Field()
+    cash_quantity: float = Field(nullable=True)
     price: float = Field()
     type: str = Field()  # enum [stop_loss, take_profit, instant]
     side: str = Field()  # enum [buy, sell]
