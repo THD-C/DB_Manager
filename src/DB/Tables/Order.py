@@ -8,11 +8,11 @@ class Order(SQLModel, BaseDBOpsModel, table=True):
 
     id: int = Field(primary_key=True, default=None)
     user_id: int = Field(foreign_key="user.ID", nullable=False)
-    wallet_id: int = Field(foreign_key="wallet.id", nullable=False)
-    date_created: datetime = Field()
+    fiat_wallet_id: int = Field(foreign_key="wallet.id", nullable=False)
+    crypto_wallet_id: int = Field(foreign_key="wallet.id", nullable=False)
+    date_created: datetime = Field(default_factory=datetime.now)
     date_executed: datetime = Field()
     status: str = Field()  # enum
-    currency: str = Field()
     nominal: float = Field()
     cash_quantity: float = Field()
     price: float = Field()
