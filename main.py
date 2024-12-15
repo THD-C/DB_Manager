@@ -8,6 +8,8 @@ import wallet.wallet_pb2_grpc as wallet_pb2_grpc
 import wallet.wallet_pb2 as wallet_pb2
 import order.order_pb2_grpc as order_pb2_grpc
 import order.order_pb2 as order_pb2
+import payment.payment_pb2_grpc as payment_pb2_grpc
+import payment.payment_pb2 as payment_pb2
 
 import src.DB as DB
 import src.Service as Service
@@ -21,12 +23,14 @@ def main() -> None:
     user_pb2_grpc.add_UserServicer_to_server(Service.User(), server)
     wallet_pb2_grpc.add_WalletsServicer_to_server(Service.Wallet(), server)
     order_pb2_grpc.add_OrderServicer_to_server(Service.Order(), server)
+    payment_pb2_grpc.add_PaymentServicer_to_server(Service.Payment(), server)
 
     # Enable reflection
     SERVICE_NAMES = (
         user_pb2.DESCRIPTOR.services_by_name["User"].full_name,
         wallet_pb2.DESCRIPTOR.services_by_name["Wallets"].full_name,
         order_pb2.DESCRIPTOR.services_by_name["Order"].full_name,
+        payment_pb2.DESCRIPTOR.services_by_name["Payment"].full_name,
         reflection.SERVICE_NAME,
     )
     reflection.enable_server_reflection(SERVICE_NAMES, server)
