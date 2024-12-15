@@ -3,7 +3,7 @@ import src.Service as Service
 import src.DB as DB
 import tests.helpers as helpers
 
-from payment.payment_pb2 import PaymentDetails, PaymentList, UserID
+from payment.payment_pb2 import PaymentDetails, UserID
 
 
 @pytest.fixture(autouse=True)
@@ -29,8 +29,12 @@ def test_create_payment_success():
 
 def test_create_payment_failure():
     s = Service.Payment()
-    payment = helpers.PAYMENT_1
-    payment.user_id = "1234312"
+    payment = PaymentDetails(
+        user_id="1213311",
+        currency="USD",
+        nominal="100.0",
+        state=1,
+    )
     p_resp = s.CreatePayment(
         payment,
         None,
