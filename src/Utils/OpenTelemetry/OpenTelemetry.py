@@ -1,45 +1,27 @@
-import os
-import base64
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
-from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import Compression
-from opentelemetry.sdk.resources import SERVICE_NAME, DEPLOYMENT_ENVIRONMENT, Resource
-from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
-from src.Utils.OpenTelemetry.config import oTelConfig as Config
+from opentelemetry.sdk.resources import SERVICE_NAME, Resource
+import src.config as Config
 
 
-if Config.trace_config_provided():
+# OpenTelemetry
+trace_resource = Resource.create(
+    attributes={
+        SERVICE_NAME: Config.SERVICE_NAME,
+    }
+)
+trace.set_tracer_provider(TracerProvider(resource=trace_resource))
 
-    trace_resource = Resource.create(
-        attributes={
-            SERVICE_NAME: "THDc-Backend",
-            DEPLOYMENT_ENVIRONMENT: Config.environment,
-        }
-    )
-    trace.set_tracer_provider(TracerProvider(resource=trace_resource))
-
-    # OTLP Exporter
-    otlp_exporter: OTLPSpanExporter = OTLPSpanExporter(
-        endpoint=Config.url,
-        headers=Config.get_auth_header(),
-        insecure=False,
-    )
-    tracer_provider: TracerProvider = trace.get_tracer_provider()
-    span_processor: BatchSpanProcessor = BatchSpanProcessor(otlp_exporter)
-    tracer_provider.add_span_processor(span_processor)
-
-
-def instrument_fastapi(app):
-    (FastAPIInstrumentor().instrument_app(app))
-
-
-def instrument_sqlalchemy(engine):
-    SQLAlchemyInstrumentor().instrument(
-        engine=engine,
-    )
+# OTLP Exporter
+# if Config.USE_TEMPO:
+otlp_exporter: OTLPSpanExporter = OTLPSpanExporter(
+    endpoint=f"http://{Config.TEMPO_HOSTNAME}:{Config.TEMPO_PORT}", insecure="true"
+)
+span_processor: BatchSpanProcessor = BatchSpanProcessor(otlp_exporter)
+tracer_provider: TracerProvider = trace.get_tracer_provider()
+tracer_provider.add_span_processor(span_processor)
 
 
 def get_trace_id() -> str:
@@ -67,3 +49,26 @@ def get_span_id() -> str:
 
 def get_response_headers() -> dict[str, str]:
     return {"trace_id": get_trace_id()}
+
+
+def get_current_span():
+    current_span = trace.get_current_span()
+    current_span.set_status(status=trace.StatusCode(2))
+
+    return current_span
+
+
+def set_current_span_status(errors: bool | set[bool] = None):
+    current_span = trace.get_current_span()
+
+    if errors is None:
+        current_span.set_status(status=trace.StatusCode(1))
+        return None
+
+    if isinstance(errors, bool):
+        if errors is not True:
+            current_span.set_status(status=trace.StatusCode(1))
+
+    elif isinstance(errors, set):
+        if True not in errors:
+            current_span.set_status(status=trace.StatusCode(1))
