@@ -14,6 +14,7 @@ class Transaction(TransactionServicer):
 
             return Utils.create_grpc_model(gRPC.TransactionDetails, transaction)
         except Exception as e:
+            Utils.record_trace_exception(e)
             print(e)
         return gRPC.TransactionDetails()
 
@@ -24,6 +25,7 @@ class Transaction(TransactionServicer):
 
             return Utils.create_grpc_model(gRPC.TransactionDetails, transaction)
         except Exception as e:
+            Utils.record_trace_exception(e)
             print(e)
         return gRPC.TransactionDetails()
 
@@ -40,6 +42,7 @@ class Transaction(TransactionServicer):
                 gRPC.TransactionList, gRPC.TransactionDetails, transactions
             )
         except Exception as e:
+            Utils.record_trace_exception(e)
             print(e)
         return gRPC.TransactionList()
 
@@ -51,6 +54,7 @@ class Transaction(TransactionServicer):
                     transaction.delete(s)
             return Utils.create_grpc_model(gRPC.TransactionDetails, transaction)
         except Exception as e:
+            Utils.record_trace_exception(e)
             print(e)
         return gRPC.TransactionDetails()
 
@@ -64,5 +68,6 @@ class Transaction(TransactionServicer):
                     )
             return Utils.create_grpc_model(gRPC.TransactionDetails, transaction)
         except Exception as e:
+            Utils.record_trace_exception(e)
             print(e)
         return gRPC.TransactionDetails()

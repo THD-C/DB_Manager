@@ -19,6 +19,7 @@ class Wallet(WalletsServicer):
                     .first()
                 )
         except Exception as e:
+            Utils.record_trace_exception(e)
             print(e)
 
         if existing_wallet:
@@ -28,6 +29,7 @@ class Wallet(WalletsServicer):
             with DB.Session() as s:
                 wallet.insert(s)
         except Exception as e:
+            Utils.record_trace_exception(e)
             print(e)
             return Utils.create_grpc_model(grpcWallet.Wallet, None)
         return Utils.create_grpc_model(grpcWallet.Wallet, wallet)
@@ -51,6 +53,7 @@ class Wallet(WalletsServicer):
                         wallet.id = None
 
         except Exception as e:
+            Utils.record_trace_exception(e)
             print(e)
             return Utils.create_grpc_model(grpcWallet.Wallet, None)
 
@@ -63,6 +66,7 @@ class Wallet(WalletsServicer):
                 if wallet:
                     wallet.delete(s)
         except Exception as e:
+            Utils.record_trace_exception(e)
             print(e)
             wallet.id = None
 
@@ -74,6 +78,7 @@ class Wallet(WalletsServicer):
             with DB.Session() as s:
                 wallet = s.query(DB.Wallet).filter(DB.Wallet.id == request.id).first()
         except Exception as e:
+            Utils.record_trace_exception(e)
             print(e)
         return Utils.create_grpc_model(grpcWallet.Wallet, wallet)
 
@@ -87,6 +92,7 @@ class Wallet(WalletsServicer):
                     s.query(DB.Wallet).filter(DB.Wallet.user_id == request.id).all()
                 )
         except Exception as e:
+            Utils.record_trace_exception(e)
             print(e)
             pass
         return Utils.create_grpc_list_model(

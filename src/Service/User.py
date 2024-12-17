@@ -56,6 +56,7 @@ class User(UserServicer):
                     user.update(s, user)
                 return RegResponse(success=True)
             except Exception as e:
+                Utils.record_trace_exception(e)
                 print(e)
 
         return RegResponse(success=False)
@@ -122,6 +123,7 @@ class User(UserServicer):
                 try:
                     db_user.update(s, DB.User.create_model(DB.User, request))
                 except Exception as e:
+                    Utils.record_trace_exception(e)
                     print(e)
                     error = True
 
@@ -142,6 +144,7 @@ class User(UserServicer):
                     db_user.update(s, db_user)
             except Exception as e:
                 print(e)
+                Utils.record_trace_exception(e)
                 error = True
 
         if error:
@@ -174,6 +177,7 @@ class User(UserServicer):
                 db_user_detail.delete(s)
                 return ResultResponse(success=True, id=request.id)
         except Exception as e:
+            Utils.record_trace_exception(e)
             print(e)
 
         return ResultResponse(success=False)

@@ -15,6 +15,7 @@ class Order(OrderServicer):
 
             return Utils.create_grpc_model(gRPC.OrderDetails, order)
         except Exception as e:
+            Utils.record_trace_exception(e)
             print(e)
         return gRPC.OrderDetails()
 
@@ -25,6 +26,7 @@ class Order(OrderServicer):
 
             return Utils.create_grpc_model(gRPC.OrderDetails, order)
         except Exception as e:
+            Utils.record_trace_exception(e)
             print(e)
         return gRPC.OrderDetails()
 
@@ -48,6 +50,7 @@ class Order(OrderServicer):
                     order.delete(s)
             return Utils.create_grpc_model(gRPC.OrderDetails, order)
         except Exception as e:
+            Utils.record_trace_exception(e)
             print(e)
         return gRPC.OrderDetails()
 
@@ -59,5 +62,6 @@ class Order(OrderServicer):
                     order.update(s, DB.Order.create_model(DB.Order, request))
             return Utils.create_grpc_model(gRPC.OrderDetails, order)
         except Exception as e:
+            Utils.record_trace_exception(e)
             print(e)
         return gRPC.OrderDetails()

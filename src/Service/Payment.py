@@ -15,6 +15,7 @@ class Payment(PaymentServicer):
 
             return Utils.create_grpc_model(gRPC.PaymentDetails, payment)
         except Exception as e:
+            Utils.record_trace_exception(e)
             print(e)
         return gRPC.PaymentDetails()
 
@@ -26,6 +27,7 @@ class Payment(PaymentServicer):
                     payment.update(s, request)
                     return Utils.create_grpc_model(gRPC.PaymentDetails, payment)
         except Exception as e:
+            Utils.record_trace_exception(e)
             print(e)
         return gRPC.PaymentDetails()
 
@@ -38,6 +40,7 @@ class Payment(PaymentServicer):
                 gRPC.PaymentList, gRPC.PaymentDetails, payments
             )
         except Exception as e:
+            Utils.record_trace_exception(e)
             print(e)
         return gRPC.PaymentList()
 
@@ -48,6 +51,7 @@ class Payment(PaymentServicer):
 
             return Utils.create_grpc_model(gRPC.PaymentDetails, payment)
         except Exception as e:
+            Utils.record_trace_exception(e)
             print(e)
         return gRPC.PaymentDetails()
 
@@ -64,5 +68,6 @@ class Payment(PaymentServicer):
                 gRPC.PaymentList, gRPC.PaymentDetails, payments
             )
         except Exception as e:
+            Utils.record_trace_exception(e)
             print(e)
         return gRPC.PaymentList()
