@@ -11,6 +11,10 @@ import order.order_pb2 as order_pb2
 import payment.payment_pb2_grpc as payment_pb2_grpc
 import payment.payment_pb2 as payment_pb2
 
+from opentelemetry.instrumentation.grpc import GrpcInstrumentorServer
+from py_grpc_prometheus.prometheus_server_interceptor import PromServerInterceptor
+from prometheus_client import start_http_server
+
 import src.DB as DB
 import src.Service as Service
 
@@ -19,7 +23,11 @@ DB.create_tables(drop_existing=os.getenv("DROP_EXISTING_DB", True))
 
 
 def main() -> None:
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    GrpcInstrumentorServer().instrument()
+    server = grpc.server(
+        futures.ThreadPoolExecutor(max_workers=10),
+        interceptors=[PromServerInterceptor(enable_handling_time_histogram=True)],
+    )
     user_pb2_grpc.add_UserServicer_to_server(Service.User(), server)
     wallet_pb2_grpc.add_WalletsServicer_to_server(Service.Wallet(), server)
     order_pb2_grpc.add_OrderServicer_to_server(Service.Order(), server)
@@ -35,6 +43,7 @@ def main() -> None:
     )
     reflection.enable_server_reflection(SERVICE_NAMES, server)
 
+    start_http_server(8111)
     server.add_insecure_port("[::]:50051")
     server.start()
     server.wait_for_termination()
