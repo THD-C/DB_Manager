@@ -2,12 +2,14 @@ from typing import Type, TypeVar
 from sqlalchemy.orm import Session
 import datetime
 
+import src.Utils as Utils
+
 T = TypeVar("T")
 
 NULL_DATE = datetime.datetime(1970, 1, 1, 0, 0)
 
 
-class BaseDBOpsModel:
+class BaseDBOpsModel(metaclass=Utils.TraceMeta):
 
     @staticmethod
     def create_model(model_class: Type[T], proto_request) -> T:
