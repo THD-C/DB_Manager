@@ -1,5 +1,6 @@
 import os
 from sqlalchemy.orm import sessionmaker
+from sqlmodel import or_
 from src.DB.Tables.Order import Order
 from src.DB.Tables.Transaction import Transaction
 from src.DB.Tables.User import User

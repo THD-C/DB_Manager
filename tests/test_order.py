@@ -4,13 +4,14 @@ import src.DB as DB
 import tests.helpers as helpers
 
 
-from order.order_pb2 import OrderID
+from order.order_pb2 import OrderID, OrderFilter
 
 
 @pytest.fixture(autouse=True)
 def setup():
     DB.create_tables(drop_existing=True)
     helpers.register_user(Service.User())
+    helpers.create_order_wallets()
     helpers.create_wallet(Service.Wallet())
 
 
@@ -173,6 +174,191 @@ def test_order_list_3_items_success():
         "2",
         "3",
     ] == [o.id for o in get_resp.orders]
+
+
+def test_get_orders_no_filter_success():
+    s = Service.Order()
+
+    o_resp = helpers.create_order(s)
+    o_resp = helpers.create_order(s, helpers.ORDER_2)
+    o_resp = helpers.create_order(s, helpers.ORDER_3)
+
+    resp = s.GetOrders(
+        OrderFilter(
+            user_id=o_resp.user_id,
+        ),
+        None,
+    )
+
+    assert len(resp.orders) == 3
+
+
+def test_get_orders_wallet_id_1_success():
+    s = Service.Order()
+
+    o_resp = helpers.create_order(s)
+    o_resp = helpers.create_order(s, helpers.ORDER_2)
+    o_resp = helpers.create_order(s, helpers.ORDER_3)
+
+    resp = s.GetOrders(
+        OrderFilter(user_id=o_resp.user_id, wallet_id="2"),
+        None,
+    )
+
+    assert len(resp.orders) == 1
+
+
+def test_get_orders_wallet_id_2_success():
+    s = Service.Order()
+
+    o_resp = helpers.create_order(s)
+    o_resp = helpers.create_order(s, helpers.ORDER_2)
+    o_resp = helpers.create_order(s, helpers.ORDER_3)
+
+    resp = s.GetOrders(
+        OrderFilter(user_id=o_resp.user_id, wallet_id="1"),
+        None,
+    )
+
+    assert len(resp.orders) == 3
+
+
+def test_get_orders_wallet_id_3_success():
+    s = Service.Order()
+
+    o_resp = helpers.create_order(s)
+    o_resp = helpers.create_order(s, helpers.ORDER_2)
+    o_resp = helpers.create_order(s, helpers.ORDER_3)
+
+    resp = s.GetOrders(
+        OrderFilter(user_id=o_resp.user_id, wallet_id="4"),
+        None,
+    )
+
+    assert len(resp.orders) == 1
+
+
+def test_get_orders_no_user_failure():
+    s = Service.Order()
+
+    _ = helpers.create_order(s)
+    _ = helpers.create_order(s, helpers.ORDER_2)
+    _ = helpers.create_order(s, helpers.ORDER_3)
+
+    resp = s.GetOrders(
+        OrderFilter(),
+        None,
+    )
+
+    assert len(resp.orders) == 0
+
+
+def test_get_orders_status_1_failure():
+    s = Service.Order()
+
+    o_resp = helpers.create_order(s)
+    o_resp = helpers.create_order(s, helpers.ORDER_2)
+    o_resp = helpers.create_order(s, helpers.ORDER_3)
+
+    resp = s.GetOrders(
+        OrderFilter(
+            user_id=o_resp.user_id,
+            status=1,
+        ),
+        None,
+    )
+
+    assert len(resp.orders) == 1
+
+
+def test_get_orders_status_2_failure():
+    s = Service.Order()
+
+    o_resp = helpers.create_order(s)
+    o_resp = helpers.create_order(s, helpers.ORDER_2)
+    o_resp = helpers.create_order(s, helpers.ORDER_3)
+
+    resp = s.GetOrders(
+        OrderFilter(
+            user_id=o_resp.user_id,
+            status=2,
+        ),
+        None,
+    )
+
+    assert len(resp.orders) == 1
+
+
+def test_get_orders_type_1_failure():
+    s = Service.Order()
+
+    o_resp = helpers.create_order(s)
+    o_resp = helpers.create_order(s, helpers.ORDER_2)
+    o_resp = helpers.create_order(s, helpers.ORDER_3)
+
+    resp = s.GetOrders(
+        OrderFilter(
+            user_id=o_resp.user_id,
+            type=1,
+        ),
+        None,
+    )
+
+    assert len(resp.orders) == 1
+
+
+def test_get_orders_type_2_failure():
+    s = Service.Order()
+
+    o_resp = helpers.create_order(s)
+    o_resp = helpers.create_order(s, helpers.ORDER_2)
+    o_resp = helpers.create_order(s, helpers.ORDER_3)
+
+    resp = s.GetOrders(
+        OrderFilter(
+            user_id=o_resp.user_id,
+            type=2,
+        ),
+        None,
+    )
+
+    assert len(resp.orders) == 1
+
+
+def test_get_orders_side_1_failure():
+    s = Service.Order()
+
+    o_resp = helpers.create_order(s)
+    o_resp = helpers.create_order(s, helpers.ORDER_2)
+    o_resp = helpers.create_order(s, helpers.ORDER_3)
+
+    resp = s.GetOrders(
+        OrderFilter(
+            user_id=o_resp.user_id,
+            side=1,
+        ),
+        None,
+    )
+
+    assert len(resp.orders) == 1
+
+
+def test_get_orders_side_2_failure():
+    s = Service.Order()
+
+    o_resp = helpers.create_order(s)
+    o_resp = helpers.create_order(s, helpers.ORDER_2)
+    o_resp = helpers.create_order(s, helpers.ORDER_3)
+
+    resp = s.GetOrders(
+        OrderFilter(
+            user_id=o_resp.user_id,
+            side=2,
+        ),
+        None,
+    )
+
+    assert len(resp.orders) == 1
 
 
 def test_order_list_0_items_success():
