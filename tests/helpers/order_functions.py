@@ -61,6 +61,7 @@ def create_order_wallets() -> None:
             user_id="1",
             currency="BTC",
             value="1000.0",
+            is_crypto=True,
         ),
         None,
     )

@@ -12,3 +12,4 @@ class Wallet(SQLModel, BaseDBOpsModel, table=True):
     )
     currency: str = Field()
     value: float = Field()
+    is_crypto: bool = Field(default=False)
