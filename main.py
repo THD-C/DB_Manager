@@ -1,6 +1,7 @@
 from concurrent import futures
 import os
 import grpc
+from grpc_health.v1 import health, health_pb2, health_pb2_grpc
 from grpc_reflection.v1alpha import reflection
 import user.user_pb2_grpc as user_pb2_grpc
 import user.user_pb2 as user_pb2
@@ -17,6 +18,7 @@ from prometheus_client import start_http_server
 
 import src.DB as DB
 import src.Service as Service
+from src.config import SERVICE_NAME
 
 
 DB.create_tables(drop_existing=os.getenv("DROP_EXISTING_DB", True))
@@ -28,6 +30,11 @@ def main() -> None:
         futures.ThreadPoolExecutor(max_workers=10),
         interceptors=[PromServerInterceptor(enable_handling_time_histogram=True)],
     )
+
+    health_servicer = health.HealthServicer()
+    health_pb2_grpc.add_HealthServicer_to_server(health_servicer, server)
+    health_servicer.set(SERVICE_NAME, health_pb2.HealthCheckResponse.SERVING)
+
     user_pb2_grpc.add_UserServicer_to_server(Service.User(), server)
     wallet_pb2_grpc.add_WalletsServicer_to_server(Service.Wallet(), server)
     order_pb2_grpc.add_OrderServicer_to_server(Service.Order(), server)

@@ -4,11 +4,18 @@ services:
       dockerfile: Dockerfile
     image: thd/dbmanager
     container_name: THD_DB_Manager
+    hostname: DB_Manager
     restart: unless-stopped
     ports:
       - 50051:50051
     environment:
       - POSTGRES_URL=postgresql://default:PL_tech_hand_elk@Postgres:5432/thdc
+    healthcheck:
+      test: ["CMD", "python", "HealthCheck.py"]
+      interval: 30s          
+      timeout: 5s            
+      retries: 3             
+      start_period: 5s       
     depends_on:
       Postgres:
         condition: service_healthy
