@@ -1,0 +1,13 @@
+TABLE_NAME_USER = "user"
+TABLE_NAME_USER_DETAIL = "user_detail"
+TABLE_NAME_WALLET = "wallet"
+TABLE_NAME_ORDER = "order"
+TABLE_NAME_TRANSACTION = "transaction"
+TABLE_NAME_PAYMENT = "payment"
+
+PK_USER = "ID"
+PK_USER_DETAIL = "ID"
+PK_WALLET = "id"
+PK_ORDER = "id"
+PK_TRANSACTION = "id"
+PK_PAYMENT = "id"
