@@ -2,9 +2,16 @@ from typing import Type, TypeVar
 from sqlalchemy.orm import Session
 import datetime
 
+from src.DB.Tables import TABLE_NAME_USER, TABLE_NAME_USER_DETAIL, PK_PAYMENT
+
 T = TypeVar("T")
 
 NULL_DATE = datetime.datetime(1970, 1, 1, 0, 0)
+
+TABLES_WITHOUT_UPPERCASE = [
+    TABLE_NAME_USER,
+    TABLE_NAME_USER_DETAIL,
+]
 
 
 class BaseDBOpsModel:
@@ -24,6 +31,13 @@ class BaseDBOpsModel:
                     data[field] = getattr(proto_request, field).ToDatetime()
                     if data[field] == NULL_DATE:
                         data[field] = None
+
+                elif (
+                    data_type is str
+                    and field != PK_PAYMENT
+                    and model_class.__tablename__ not in TABLES_WITHOUT_UPPERCASE
+                ):
+                    data[field] = str(getattr(proto_request, field)).upper()
                 else:
                     data[field] = data_type(getattr(proto_request, field))
             else:
