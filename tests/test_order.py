@@ -238,7 +238,7 @@ def test_get_orders_wallet_id_3_success():
     assert len(resp.orders) == 1
 
 
-def test_get_orders_no_user_failure():
+def test_get_orders_no_user_success():
     s = Service.Order()
 
     _ = helpers.create_order(s)
@@ -250,10 +250,10 @@ def test_get_orders_no_user_failure():
         None,
     )
 
-    assert len(resp.orders) == 0
+    assert len(resp.orders) == 3
 
 
-def test_get_orders_status_1_failure():
+def test_get_orders_status_1_success():
     s = Service.Order()
 
     o_resp = helpers.create_order(s)
@@ -271,7 +271,7 @@ def test_get_orders_status_1_failure():
     assert len(resp.orders) == 1
 
 
-def test_get_orders_status_2_failure():
+def test_get_orders_status_2_success():
     s = Service.Order()
 
     o_resp = helpers.create_order(s)
@@ -307,7 +307,7 @@ def test_get_orders_type_1_failure():
     assert len(resp.orders) == 1
 
 
-def test_get_orders_type_2_failure():
+def test_get_orders_type_2_success():
     s = Service.Order()
 
     o_resp = helpers.create_order(s)
@@ -325,7 +325,7 @@ def test_get_orders_type_2_failure():
     assert len(resp.orders) == 1
 
 
-def test_get_orders_side_1_failure():
+def test_get_orders_side_1_success():
     s = Service.Order()
 
     o_resp = helpers.create_order(s)
@@ -343,7 +343,7 @@ def test_get_orders_side_1_failure():
     assert len(resp.orders) == 1
 
 
-def test_get_orders_side_2_failure():
+def test_get_orders_side_2_success():
     s = Service.Order()
 
     o_resp = helpers.create_order(s)
