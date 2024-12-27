@@ -34,15 +34,14 @@ class Order(OrderServicer):
         return gRPC.OrderDetails()
 
     def GetOrders(self, request: gRPC.OrderFilter, context):
-        if not request.user_id:
-            return gRPC.OrderList()
-
         try:
             with DB.Session() as s:
+                orders_query = s.query(DB.Order)
 
-                orders_query = s.query(DB.Order).filter(
-                    DB.Order.user_id == request.user_id
-                )
+                if request.user_id:
+                    orders_query = orders_query.filter(
+                        DB.Order.user_id == request.user_id
+                    )
 
                 if request.wallet_id:
                     orders_query = orders_query.filter(
