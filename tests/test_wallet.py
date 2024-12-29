@@ -3,7 +3,7 @@ import src.Service as Service
 import src.DB as DB
 import tests.helpers as helpers
 
-from wallet.wallet_pb2 import Wallet, WalletID, UserID
+from wallet.wallet_pb2 import Wallet, WalletID, UserID, Empty
 
 
 @pytest.fixture(autouse=True)
@@ -114,6 +114,27 @@ def test_delete_wallet_fail():
     assert w_resp.currency == ""
     assert w_resp.value == ""
     assert w_resp.user_id == ""
+
+
+def test_get_all_wallets_empty_success():
+    s = Service.Wallet()
+    w_resp = s.GetAllWallets(
+        Empty(),
+        None,
+    )
+    assert len(w_resp.wallets) == 0
+
+
+def test_get_all_wallets_success():
+    s = Service.Wallet()
+    helpers.create_wallet(s)
+    helpers.create_wallet(s, helpers.WALLET_2)
+    helpers.create_wallet(s, helpers.WALLET_3)
+    w_resp = s.GetAllWallets(
+        Empty(),
+        None,
+    )
+    assert len(w_resp.wallets) == 3
 
 
 def test_get_wallet_2_success():
@@ -239,6 +260,7 @@ def test_get_user_wallet_list_2_success():
         "2",
     ] == [w.id for w in w_resp.wallets]
 
+
 def test_get_user_wallet_list_1_success():
     s = Service.Wallet()
     helpers.create_wallet(s)
@@ -263,7 +285,8 @@ def test_get_user_wallet_list_1_success():
     assert [
         "1",
     ] == [w.id for w in w_resp.wallets]
-    
+
+
 def test_get_user_wallet_list_fail():
     s = Service.Wallet()
     helpers.create_wallet(s)
@@ -276,4 +299,3 @@ def test_get_user_wallet_list_fail():
     )
 
     assert len(w_resp.wallets) == 0
-    

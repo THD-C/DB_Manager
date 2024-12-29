@@ -82,6 +82,17 @@ class Wallet(WalletsServicer):
             print(e)
         return Utils.create_grpc_model(grpcWallet.Wallet, wallet)
 
+    def GetAllWallets(self, request, context):
+        try:
+            with DB.Session() as s:
+                wallets: list[DB.Wallet] = s.query(DB.Wallet).all()
+        except Exception as e:
+            Utils.record_trace_exception(e)
+            print(e)
+        return Utils.create_grpc_list_model(
+            grpcWallet.WalletList, grpcWallet.Wallet, wallets
+        )
+
     def GetUsersWallets(
         self, request: grpcWallet.UserID, context
     ) -> grpcWallet.WalletList:
