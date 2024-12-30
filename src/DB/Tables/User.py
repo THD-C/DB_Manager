@@ -11,6 +11,7 @@ class User(SQLModel, BaseDBOpsModel, table=True):
     username: str = Field(unique=True)
     email: str = Field(unique=True, nullable=False)
     password: str = Field(nullable=False)
+    user_type: int = Field(nullable=False, default=0)
 
     user_detail_ID: int = Field(
         foreign_key=f"{TABLE_NAME_USER_DETAIL}.{PK_USER_DETAIL}",
