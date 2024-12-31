@@ -80,6 +80,7 @@ class User(UserServicer):
                 id=str(db_user.ID),
                 username=str(db_user.username),
                 email=str(db_user.email),
+                user_type=db_user.user_type,
             )
 
         return AuthResponse(success=False)
@@ -119,7 +120,7 @@ class User(UserServicer):
             if db_user is None:
                 return ResultResponse(success=False)
 
-            if request.email:
+            if request.email or request.user_type:
                 try:
                     db_user.update(s, DB.User.create_model(DB.User, request))
                 except Exception as e:
