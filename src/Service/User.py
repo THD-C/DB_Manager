@@ -13,6 +13,11 @@ from user.user_pb2 import (
     UsersList,
     UserAdministrativeData,
 )
+from user.user_type_pb2 import (
+    USER_TYPE_SUPER_ADMIN_USER,
+    USER_TYPE_BLOGGER_USER,
+    USER_TYPE_STANDARD_USER,
+)
 from sqlalchemy import or_
 
 import src.DB as DB
@@ -123,7 +128,11 @@ class User(UserServicer):
             if db_user is None:
                 return ResultResponse(success=False)
 
-            if request.email or request.user_type:
+            if request.email or request.user_type in [
+                USER_TYPE_STANDARD_USER,
+                USER_TYPE_BLOGGER_USER,
+                USER_TYPE_SUPER_ADMIN_USER,
+            ]:
                 try:
                     db_user.update(s, DB.User.create_model(DB.User, request))
                 except Exception as e:
