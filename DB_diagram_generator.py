@@ -1,7 +1,7 @@
 import os
 import subprocess
 from eralchemy import render_er
-from src.DB.startup import SQLModel
+from src.DB.start.create_tables import SQLModel
 
 
 def main():
