@@ -9,6 +9,9 @@ from user.user_pb2 import (
     UserDetails,
     ResultResponse,
     ChangePass,
+    AllUsersRequest,
+    UsersList,
+    UserAdministrativeData,
 )
 from sqlalchemy import or_
 
@@ -182,3 +185,16 @@ class User(UserServicer):
             print(e)
 
         return ResultResponse(success=False)
+
+    def GetAllUsers(self, request: AllUsersRequest, context):
+        try:
+            with DB.Session() as s:
+                db_users = s.query(DB.User).all()
+                return Utils.create_grpc_list_model(
+                    UsersList, UserAdministrativeData, db_users
+                )
+        except Exception as e:
+            Utils.record_trace_exception(e)
+            print(e)
+
+        return UsersList()
