@@ -16,12 +16,16 @@ from opentelemetry.instrumentation.grpc import GrpcInstrumentorServer
 from py_grpc_prometheus.prometheus_server_interceptor import PromServerInterceptor
 from prometheus_client import start_http_server
 
-import src.DB as DB
 import src.Service as Service
 from src.config import SERVICE_NAME
+from src.DB.start.create_tables import create_tables
+from src.DB.start.create_admin import create_admin_user
 
-
-DB.create_tables(drop_existing=os.getenv("DROP_EXISTING_DB", True))
+create_tables(drop_existing=os.getenv("DROP_EXISTING_DB", True))
+create_admin_user(
+    user_name=os.getenv("ADMIN_USER", "admin"),
+    user_password=os.getenv("ADMIN_PASS", "admin"),
+)
 
 
 def main() -> None:

@@ -1,15 +1,15 @@
 import pytest
 import src.Service as Service
-import src.DB as DB
 import tests.helpers as helpers
 
 from transaction.transaction_pb2 import TransactionDetails, WalletID, TransactionID
 from google.protobuf.timestamp_pb2 import Timestamp
+from src.DB.start.create_tables import create_tables
 
 
 @pytest.fixture(autouse=True)
 def setup():
-    DB.create_tables(drop_existing=True)
+    create_tables(drop_existing=True)
     helpers.register_user(Service.User())
     helpers.create_wallet(Service.Wallet())
 
@@ -223,6 +223,7 @@ def test_delete_transaction_fail():
     assert d_resp.operation_type == 0
     assert d_resp.wallet_id == ""
 
+
 def test_delete_transaction_null_id_fail():
     s = Service.Transaction()
 
@@ -240,6 +241,7 @@ def test_delete_transaction_null_id_fail():
     assert d_resp.nominal_value == ""
     assert d_resp.operation_type == 0
     assert d_resp.wallet_id == ""
+
 
 def test_update_transaction_success():
     s = Service.Transaction()
@@ -271,10 +273,10 @@ def test_update_transaction_success():
     assert get_resp.nominal_value == t_resp.nominal_value
     assert get_resp.operation_type == t_resp.operation_type
     assert get_resp.wallet_id == t_resp.wallet_id
-    
+
+
 def test_update_transaction_fail():
     s = Service.Transaction()
-
 
     u_resp = s.UpdateTransaction(
         TransactionDetails(),

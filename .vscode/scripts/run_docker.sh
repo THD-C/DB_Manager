@@ -13,7 +13,7 @@ fi
 if ! docker-compose ps | grep 'Up' >/dev/null 2>&1
 then
     echo "Docker Compose is not running. Building and starting..."
-    docker-compose up --build -d Postgres
+    docker-compose up --build -d Postgres Mongo Mongo_Manager
     # init variable
     numOfDBstartups=0
 

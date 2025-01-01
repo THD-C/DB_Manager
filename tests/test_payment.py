@@ -1,14 +1,14 @@
 import pytest
 import src.Service as Service
-import src.DB as DB
 import tests.helpers as helpers
 
 from payment.payment_pb2 import PaymentDetails, UserID, UnpaidSessions
+from src.DB.start.create_tables import create_tables
 
 
 @pytest.fixture(autouse=True)
 def setup():
-    DB.create_tables(drop_existing=True)
+    create_tables(drop_existing=True)
     helpers.register_user(Service.User())
 
 
