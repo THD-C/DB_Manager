@@ -8,6 +8,5 @@ from src.DB.Tables.UserDetail import UserDetail
 from src.DB.Tables.Wallet import Wallet
 from src.DB.Tables.Payment import Payment
 from src.DB.engine import engine
-from src.DB.startup import create_tables
 
 Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
