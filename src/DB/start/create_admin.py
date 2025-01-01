@@ -5,7 +5,8 @@ from secret import secret_pb2_grpc, secret_pb2
 from argon2 import PasswordHasher
 from src.config import MONGO_MANAGER, MONGO_MANAGER_PORT
 from src.Service.User import User
-from user.user_pb2 import RegUser, RegResponse
+from user.user_pb2 import RegUser, RegResponse, AuthUser, ReqUpdateUser
+from user.user_type_pb2 import USER_TYPE_SUPER_ADMIN_USER
 
 
 def create_admin_user(user_name: str, user_password: str):
@@ -29,6 +30,7 @@ def create_admin_user(user_name: str, user_password: str):
     all_users = s.GetAllUsers(None, None)
     admin = [user for user in all_users.user_data if user.username == user_name]
     if len(admin) > 0:
+        print(f"{user_name} user already exists")
         return
 
     response: RegResponse = s.Register(
@@ -36,8 +38,19 @@ def create_admin_user(user_name: str, user_password: str):
             username=user_name,
             email=f"{user_name}@thdc.pl",
             password=password_hash,
+            name="Super",
+            surname="Admin",
+            street="Zeromskiego",
+            building="116",
+            city="Lodz",
+            postal_code="90-924",
+            country="Poland",
         ),
         None,
     )
     if not response.success:
         raise Exception("Failed to create admin user")
+
+    auth = s.Authenticate(AuthUser(login=user_name, password=password_hash), None)
+
+    s.Update(ReqUpdateUser(id=auth.id, user_type=USER_TYPE_SUPER_ADMIN_USER), None)
