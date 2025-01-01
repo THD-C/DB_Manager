@@ -12,11 +12,12 @@ from user.user_pb2 import (
     ChangePass,
     AllUsersRequest,
 )
+from src.DB.start.create_tables import create_tables
 
 
 @pytest.fixture(autouse=True)
 def setup():
-    DB.create_tables(drop_existing=True)
+    create_tables(drop_existing=True)
     print("Setup completed")
 
 

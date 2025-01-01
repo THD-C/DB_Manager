@@ -5,11 +5,12 @@ import tests.helpers as helpers
 
 
 from order.order_pb2 import OrderID, OrderFilter
+from src.DB.start.create_tables import create_tables
 
 
 @pytest.fixture(autouse=True)
 def setup():
-    DB.create_tables(drop_existing=True)
+    create_tables(drop_existing=True)
     helpers.register_user(Service.User())
     helpers.create_order_wallets()
     helpers.create_wallet(Service.Wallet())
