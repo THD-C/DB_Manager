@@ -1,6 +1,5 @@
 import pytest
 import src.Service as Service
-import src.DB as DB
 import tests.helpers as helpers
 
 from transaction.transaction_pb2 import TransactionDetails, WalletID, TransactionID

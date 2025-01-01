@@ -1,6 +1,5 @@
 import pytest
 import src.Service as Service
-import src.DB as DB
 import tests.helpers as helpers
 
 from wallet.wallet_pb2 import Wallet, WalletID, UserID, Empty

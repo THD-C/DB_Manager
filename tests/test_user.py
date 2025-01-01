@@ -1,6 +1,5 @@
 import pytest
 import src.Service as Service
-import src.DB as DB
 import tests.helpers as helpers
 
 from user.user_pb2 import (

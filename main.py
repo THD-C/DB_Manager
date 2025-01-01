@@ -16,7 +16,6 @@ from opentelemetry.instrumentation.grpc import GrpcInstrumentorServer
 from py_grpc_prometheus.prometheus_server_interceptor import PromServerInterceptor
 from prometheus_client import start_http_server
 
-import src.DB as DB
 import src.Service as Service
 from src.config import SERVICE_NAME
 from src.DB.start.create_tables import create_tables
