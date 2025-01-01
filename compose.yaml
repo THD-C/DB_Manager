@@ -37,5 +37,49 @@ services:
       start_period: 30s
       timeout: 10s
 
+  Mongo:
+    build: 
+      context: https://github.com/THD-C/Mongo.git
+      secrets:
+          - github_token
+    image: thd/mongo
+    container_name: THD_Mongo
+    hostname: Mongo
+    restart: unless-stopped
+    ports:
+      - 27017:27017 
+    volumes:
+      - MO-Data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+
+  Mongo_Manager:
+    build: https://github.com/THD-C/Mongo_Manager.git
+    image: thd/mongo_manager
+    container_name: THD_Mongo_Manager
+    hostname: Mongo_Manager
+    restart: unless-stopped
+    environment:
+      - MONGO_URL=mongodb://Mongo/THDC
+    ports:
+      - 50052:50051
+    healthcheck:
+      test: ["CMD", "python", "HealthCheck.py"]
+      interval: 30s          
+      timeout: 5s            
+      retries: 3             
+      start_period: 5s       
+    depends_on:
+      Mongo:
+        condition: service_healthy
+
 volumes:
   PG-Data:
+  MO-Data:
+
+secrets:
+  github_token:
+    file: ./.github_token
