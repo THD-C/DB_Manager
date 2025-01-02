@@ -179,7 +179,8 @@ class User(UserServicer):
                 )
 
                 db_user.delete(s)
-                db_user_detail.delete(s)
+                if db_user_detail is not None:
+                    db_user_detail.delete(s)
                 return ResultResponse(success=True, id=request.id)
         except Exception as e:
             Utils.record_trace_exception(e)
