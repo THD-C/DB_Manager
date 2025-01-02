@@ -548,11 +548,7 @@ def test_delete_user_success():
         None,
     )
     d_resp = s.Delete(
-        ReqDeleteUser(
-            id=a_resp.id,
-            mail=helpers.USER_REGISTER_REQUEST_1.email,
-            password=helpers.USER_REGISTER_REQUEST_1.password,
-        ),
+        ReqDeleteUser(id=a_resp.id),
         None,
     )
     auth_after_delete = s.Authenticate(
@@ -583,11 +579,7 @@ def test_delete_user_fail():
         None,
     )
     d_resp = s.Delete(
-        ReqDeleteUser(
-            id="1231341421313",
-            mail=helpers.USER_REGISTER_REQUEST_1.email,
-            password=helpers.USER_REGISTER_REQUEST_1.password,
-        ),
+        ReqDeleteUser(id="1231341421313"),
         None,
     )
     assert d_resp.success is False

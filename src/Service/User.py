@@ -168,15 +168,7 @@ class User(UserServicer):
     def Delete(self, request: ReqDeleteUser, context):
         try:
             with DB.Session() as s:
-                db_user = (
-                    s.query(DB.User)
-                    .filter(
-                        DB.User.ID == int(request.id),
-                        DB.User.email == request.mail,
-                        DB.User.password == request.password,
-                    )
-                    .first()
-                )
+                db_user = s.query(DB.User).filter(DB.User.ID == int(request.id)).first()
                 if db_user is None:
                     return ResultResponse(success=False)
 
