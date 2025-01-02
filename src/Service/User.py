@@ -37,11 +37,10 @@ class User(UserServicer):
                     db_user = s.query(DB.User).filter(DB.User.ID == response.id).first()
                     db_user.update(
                         s,
-                        DB.User.create_model(
-                            DB.User,
-                            ReqUpdateUser(
-                                id=response.id, password=request.new_password
-                            ),
+                        DB.User(
+                            ID=int(db_user.ID),
+                            password=request.new_password,
+                            user_type=db_user.user_type,
                         ),
                     )
                     return ResultResponse(success=True)
@@ -115,6 +114,7 @@ class User(UserServicer):
             UserDetails,
             {
                 **db_user_detail.model_dump(),
+                "id": db_user.ID,
                 "username": db_user.username,
                 "email": db_user.email,
             },

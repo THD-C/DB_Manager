@@ -635,18 +635,18 @@ def test_get_registered_users_users_modified_type_success():
     )
 
     _ = s.Update(
-        ReqUpdateUser(id=a_resp_2.id, user_type=1),
+        ReqUpdateUser(id=a_resp_2.id, user_type=2),
         None,
     )
 
     _ = s.Update(
-        ReqUpdateUser(id=a_resp_3.id, user_type=2),
+        ReqUpdateUser(id=a_resp_3.id, user_type=3),
         None,
     )
 
     resp = s.GetAllUsers(AllUsersRequest(), None)
 
     assert len(resp.user_data) == 3
-    assert resp.user_data[0].user_type == 0
-    assert resp.user_data[1].user_type == 1
-    assert resp.user_data[2].user_type == 2
+    assert resp.user_data[0].user_type == 1
+    assert resp.user_data[1].user_type == 2
+    assert resp.user_data[2].user_type == 3

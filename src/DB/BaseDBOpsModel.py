@@ -71,7 +71,7 @@ class BaseDBOpsModel:
         for f in fields:
             value = getattr(values_to_update, f)
             # if value is None, then we want to keep the existing value
-            if value is not None and f != "id":
+            if value and f != "id":
                 setattr(self, f, value)
 
     @staticmethod
