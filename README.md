@@ -1,6 +1,6 @@
 # DB_Manager
 
-![image](/ERD.png)
+![image](https://raw.githubusercontent.com/THD-C/DB_Manager/main/ERD.png)
 
 This Python-based microservice facilitates communication with a PostgreSQL database, offering a comprehensive set of CRUD operations. Key features include:
 
