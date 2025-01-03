@@ -5,9 +5,9 @@
 This Python-based microservice facilitates communication with a PostgreSQL database, offering a comprehensive set of CRUD operations. Key features include:
 
 - ORM with `SQLModel`: Leverages the SQLModel library for object-relational mapping to interact seamlessly with the database.
-- `OpenTelemetry` Integration: Implements distributed tracing using OpenTelemetry, sending trace data to Grafana Tempo, an open-source, high-performance tracing backend.
-- `Prometheus Metrics`: Exposes Prometheus-compatible metrics on port 8111 for monitoring and observability.
-- `RPC Server`: Operates a gRPC server on port 50051 for efficient and reliable communication.
+- `OpenTelemetry` Integration: Implements distributed tracing using OpenTelemetry, sending trace data to Grafana Tempo (host: `Tempo`,  port: `4317`), an open-source, high-performance tracing backend.
+- `Prometheus Metrics`: Exposes Prometheus-compatible metrics on port `8111` for monitoring and observability.
+- `RPC Server`: Operates a gRPC server on port `50051` for efficient and reliable communication.
 
 Microservice is optimized for scalability and observability, making it ideal for modern, distributed applications.
 
